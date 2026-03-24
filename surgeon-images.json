@@ -1,0 +1,383 @@
+{
+  "_comment": "VUE Image Deposit — surgeons add entries here (or via API). Each image object represents one before/after pair uploaded by a verified surgeon.",
+  "surgeons": [
+    {
+      "id": 1,
+      "name": "Dr. Amara Chen",
+      "specialty": "Facial Aesthetics",
+      "location": "New York, NY",
+      "lat": 40.7128,
+      "lng": -74.0060,
+      "rating": 4.9,
+      "years": 14,
+      "photo": "https://placehold.co/80x80/C8DDD8/1F5555?text=AC",
+      "verified": true
+    },
+    {
+      "id": 2,
+      "name": "Dr. Marcus Williams",
+      "specialty": "Body Contouring",
+      "location": "Los Angeles, CA",
+      "lat": 34.0522,
+      "lng": -118.2437,
+      "rating": 4.8,
+      "years": 18,
+      "photo": "https://placehold.co/80x80/D8D5C8/5A5018?text=MW",
+      "verified": true
+    },
+    {
+      "id": 3,
+      "name": "Dr. Priya Patel",
+      "specialty": "Breast Aesthetics",
+      "location": "Chicago, IL",
+      "lat": 41.8781,
+      "lng": -87.6298,
+      "rating": 4.9,
+      "years": 11,
+      "photo": "https://placehold.co/80x80/D5C8D8/4A1F55?text=PP",
+      "verified": true
+    },
+    {
+      "id": 4,
+      "name": "Dr. James Okafor",
+      "specialty": "Rhinoplasty",
+      "location": "Miami, FL",
+      "lat": 25.7617,
+      "lng": -80.1918,
+      "rating": 4.7,
+      "years": 16,
+      "photo": "https://placehold.co/80x80/C8D5D8/1F3F55?text=JO",
+      "verified": true
+    },
+    {
+      "id": 5,
+      "name": "Dr. Sofia Reyes",
+      "specialty": "Anti-Aging & Lifts",
+      "location": "Dallas, TX",
+      "lat": 32.7767,
+      "lng": -96.7970,
+      "rating": 4.8,
+      "years": 13,
+      "photo": "https://placehold.co/80x80/D8CAC8/552018?text=SR",
+      "verified": true
+    },
+    {
+      "id": 6,
+      "name": "Dr. Daniel Park",
+      "specialty": "Reconstructive",
+      "location": "Seattle, WA",
+      "lat": 47.6062,
+      "lng": -122.3321,
+      "rating": 4.9,
+      "years": 20,
+      "photo": "https://placehold.co/80x80/C8D8CA/1F5520?text=DP",
+      "verified": true
+    },
+    {
+      "id": 7,
+      "name": "Dr. Natasha Ivanova",
+      "specialty": "Non-Surgical",
+      "location": "Boston, MA",
+      "lat": 42.3601,
+      "lng": -71.0589,
+      "rating": 4.8,
+      "years": 9,
+      "photo": "https://placehold.co/80x80/D8D8C8/505518?text=NI",
+      "verified": true
+    },
+    {
+      "id": 8,
+      "name": "Dr. Elias Hartmann",
+      "specialty": "Facial Reconstruction",
+      "location": "San Francisco, CA",
+      "lat": 37.7749,
+      "lng": -122.4194,
+      "rating": 4.9,
+      "years": 22,
+      "photo": "https://placehold.co/80x80/C8CCD8/1F2855?text=EH",
+      "verified": true
+    }
+  ],
+  "images": [
+    {
+      "id": 1,
+      "surgeonId": 1,
+      "procedure": "Rhinoplasty",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/D4CFC9/8A7F76?text=+",
+      "afterUrl":  "https://placehold.co/600x320/C5DDD8/1F6058?text=+"
+    },
+    {
+      "id": 2,
+      "surgeonId": 1,
+      "procedure": "Blepharoplasty",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/D2CFC8/8A7F70?text=+",
+      "afterUrl":  "https://placehold.co/600x320/C8D8D4/256060?text=+"
+    },
+    {
+      "id": 3,
+      "surgeonId": 1,
+      "procedure": "Chin Augmentation",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/D5D0CA/8A8078?text=+",
+      "afterUrl":  "https://placehold.co/600x320/C6DCD6/206258?text=+"
+    },
+    {
+      "id": 4,
+      "surgeonId": 1,
+      "procedure": "Brow Lift",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/D3CFCB/8A8076?text=+",
+      "afterUrl":  "https://placehold.co/600x320/C7DDD8/1E6060?text=+"
+    },
+    {
+      "id": 5,
+      "surgeonId": 1,
+      "procedure": "Lip Lift",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/D4D0CB/8A8076?text=+",
+      "afterUrl":  "https://placehold.co/600x320/C6DDD7/1E5E58?text=+"
+    },
+    {
+      "id": 6,
+      "surgeonId": 2,
+      "procedure": "Liposuction",
+      "category": "Body",
+      "beforeUrl": "https://placehold.co/600x320/D0CEC6/807870?text=+",
+      "afterUrl":  "https://placehold.co/600x320/D8CCA0/706010?text=+"
+    },
+    {
+      "id": 7,
+      "surgeonId": 2,
+      "procedure": "Tummy Tuck",
+      "category": "Body",
+      "beforeUrl": "https://placehold.co/600x320/D1CFC7/807868?text=+",
+      "afterUrl":  "https://placehold.co/600x320/D9CDA2/726012?text=+"
+    },
+    {
+      "id": 8,
+      "surgeonId": 2,
+      "procedure": "Body Contouring",
+      "category": "Body",
+      "beforeUrl": "https://placehold.co/600x320/CFCDC5/807870?text=+",
+      "afterUrl":  "https://placehold.co/600x320/D7CB9E/6E5E10?text=+"
+    },
+    {
+      "id": 9,
+      "surgeonId": 2,
+      "procedure": "Arm Lift",
+      "category": "Body",
+      "beforeUrl": "https://placehold.co/600x320/D2D0C8/807870?text=+",
+      "afterUrl":  "https://placehold.co/600x320/D8CCA0/70600E?text=+"
+    },
+    {
+      "id": 10,
+      "surgeonId": 2,
+      "procedure": "Brazilian Butt Lift",
+      "category": "Body",
+      "beforeUrl": "https://placehold.co/600x320/D1CFC7/807868?text=+",
+      "afterUrl":  "https://placehold.co/600x320/D8CCA2/706010?text=+"
+    },
+    {
+      "id": 11,
+      "surgeonId": 3,
+      "procedure": "Breast Augmentation",
+      "category": "Breast",
+      "beforeUrl": "https://placehold.co/600x320/D0CBD0/786878?text=+",
+      "afterUrl":  "https://placehold.co/600x320/D0C8D8/4A3860?text=+"
+    },
+    {
+      "id": 12,
+      "surgeonId": 3,
+      "procedure": "Breast Lift",
+      "category": "Breast",
+      "beforeUrl": "https://placehold.co/600x320/D1CCD0/786878?text=+",
+      "afterUrl":  "https://placehold.co/600x320/D1C9D9/4A3860?text=+"
+    },
+    {
+      "id": 13,
+      "surgeonId": 3,
+      "procedure": "Breast Reduction",
+      "category": "Breast",
+      "beforeUrl": "https://placehold.co/600x320/CFCACF/786878?text=+",
+      "afterUrl":  "https://placehold.co/600x320/CFCAD8/483860?text=+"
+    },
+    {
+      "id": 14,
+      "surgeonId": 3,
+      "procedure": "Implant Revision",
+      "category": "Breast",
+      "beforeUrl": "https://placehold.co/600x320/D2CDD1/786878?text=+",
+      "afterUrl":  "https://placehold.co/600x320/D2CBD8/4C3860?text=+"
+    },
+    {
+      "id": 15,
+      "surgeonId": 4,
+      "procedure": "Rhinoplasty",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/D4D0CC/807870?text=+",
+      "afterUrl":  "https://placehold.co/600x320/BDD8D2/1A5A55?text=+"
+    },
+    {
+      "id": 16,
+      "surgeonId": 4,
+      "procedure": "Septoplasty",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/D3CFCC/807870?text=+",
+      "afterUrl":  "https://placehold.co/600x320/BED9D3/1A5A55?text=+"
+    },
+    {
+      "id": 17,
+      "surgeonId": 4,
+      "procedure": "Revision Rhinoplasty",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/D5D1CD/807870?text=+",
+      "afterUrl":  "https://placehold.co/600x320/BFD8D2/1C5A55?text=+"
+    },
+    {
+      "id": 18,
+      "surgeonId": 4,
+      "procedure": "Tip Refinement",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/D4D0CC/807870?text=+",
+      "afterUrl":  "https://placehold.co/600x320/C0D8D3/1C5A56?text=+"
+    },
+    {
+      "id": 19,
+      "surgeonId": 5,
+      "procedure": "Facelift",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/D3CCC7/806058?text=+",
+      "afterUrl":  "https://placehold.co/600x320/D8C4A0/785010?text=+"
+    },
+    {
+      "id": 20,
+      "surgeonId": 5,
+      "procedure": "Neck Lift",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/D2CBC6/806058?text=+",
+      "afterUrl":  "https://placehold.co/600x320/D7C3A0/785010?text=+"
+    },
+    {
+      "id": 21,
+      "surgeonId": 5,
+      "procedure": "Brow Lift",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/D4CEC8/806058?text=+",
+      "afterUrl":  "https://placehold.co/600x320/D8C4A0/785012?text=+"
+    },
+    {
+      "id": 22,
+      "surgeonId": 5,
+      "procedure": "Mid-Face Lift",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/D3CDC7/806058?text=+",
+      "afterUrl":  "https://placehold.co/600x320/D7C4A0/785010?text=+"
+    },
+    {
+      "id": 23,
+      "surgeonId": 5,
+      "procedure": "Fat Transfer",
+      "category": "Body",
+      "beforeUrl": "https://placehold.co/600x320/D3CCC7/806058?text=+",
+      "afterUrl":  "https://placehold.co/600x320/D9C5A1/785012?text=+"
+    },
+    {
+      "id": 24,
+      "surgeonId": 6,
+      "procedure": "Ear Reshaping",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/CCCFCC/6A786A?text=+",
+      "afterUrl":  "https://placehold.co/600x320/C0D8C0/1A581A?text=+"
+    },
+    {
+      "id": 25,
+      "surgeonId": 6,
+      "procedure": "Scar Revision",
+      "category": "Skin",
+      "beforeUrl": "https://placehold.co/600x320/CDCFCD/6A786A?text=+",
+      "afterUrl":  "https://placehold.co/600x320/C0D8C2/1A5820?text=+"
+    },
+    {
+      "id": 26,
+      "surgeonId": 6,
+      "procedure": "Jaw Recontouring",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/CCCFCC/6A786A?text=+",
+      "afterUrl":  "https://placehold.co/600x320/C1D8C2/1B5820?text=+"
+    },
+    {
+      "id": 27,
+      "surgeonId": 6,
+      "procedure": "Chin Implant",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/CDCFCC/6A786A?text=+",
+      "afterUrl":  "https://placehold.co/600x320/C0D8C0/1A5820?text=+"
+    },
+    {
+      "id": 28,
+      "surgeonId": 7,
+      "procedure": "Filler Treatment",
+      "category": "Non-Surgical",
+      "beforeUrl": "https://placehold.co/600x320/D2D0CC/807870?text=+",
+      "afterUrl":  "https://placehold.co/600x320/D4D0A8/707010?text=+"
+    },
+    {
+      "id": 29,
+      "surgeonId": 7,
+      "procedure": "Botox",
+      "category": "Non-Surgical",
+      "beforeUrl": "https://placehold.co/600x320/D1CFCB/807870?text=+",
+      "afterUrl":  "https://placehold.co/600x320/D3CFA8/706E10?text=+"
+    },
+    {
+      "id": 30,
+      "surgeonId": 7,
+      "procedure": "Skin Resurfacing",
+      "category": "Skin",
+      "beforeUrl": "https://placehold.co/600x320/D0CECA/807868?text=+",
+      "afterUrl":  "https://placehold.co/600x320/D4D0A8/707010?text=+"
+    },
+    {
+      "id": 31,
+      "surgeonId": 7,
+      "procedure": "Thread Lift",
+      "category": "Non-Surgical",
+      "beforeUrl": "https://placehold.co/600x320/D3D1CD/807870?text=+",
+      "afterUrl":  "https://placehold.co/600x320/D5D1AA/727010?text=+"
+    },
+    {
+      "id": 32,
+      "surgeonId": 8,
+      "procedure": "Rhinoplasty",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/CCCCD0/686878?text=+",
+      "afterUrl":  "https://placehold.co/600x320/C0C0D8/18185A?text=+"
+    },
+    {
+      "id": 33,
+      "surgeonId": 8,
+      "procedure": "Cheek Augmentation",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/CBCDD0/686878?text=+",
+      "afterUrl":  "https://placehold.co/600x320/C0C1D8/18185A?text=+"
+    },
+    {
+      "id": 34,
+      "surgeonId": 8,
+      "procedure": "Jaw Implant",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/CCCDD0/686878?text=+",
+      "afterUrl":  "https://placehold.co/600x320/C0C2D8/18185A?text=+"
+    },
+    {
+      "id": 35,
+      "surgeonId": 8,
+      "procedure": "Forehead Reduction",
+      "category": "Facial",
+      "beforeUrl": "https://placehold.co/600x320/CDCED0/686878?text=+",
+      "afterUrl":  "https://placehold.co/600x320/C1C2D8/18185C?text=+"
+    }
+  ]
+}

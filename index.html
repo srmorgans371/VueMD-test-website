@@ -1,0 +1,2738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VUE — Find Your Surgeon</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #F7F3ED; color: #1A3A3A; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+    /* ── Variables ── */
+    :root {
+      --teal:       #2D7070;
+      --teal-dark:  #1F5555;
+      --teal-light: #3D8888;
+      --teal-faint: #EBF4F4;
+      --gold:       #C4A855;
+      --gold-dark:  #A88C3A;
+      --gold-light: #D4BB77;
+      --ivory:      #F7F3ED;
+      --ivory-dark: #EDE6DA;
+      --deep:       #1A3A3A;
+    }
+
+    /* ── Typography ── */
+    .font-display { font-family: 'Playfair Display', Georgia, serif; }
+
+    /* ── Grain overlay ── */
+    .grain::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      border-radius: inherit;
+      z-index: 0;
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 0.875rem 2rem; background: var(--teal); color: #fff;
+      font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.13em; text-transform: uppercase;
+      border-radius: 9999px; border: none; cursor: pointer; text-decoration: none;
+      transition: background 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s cubic-bezier(.22,1,.36,1), transform 0.18s cubic-bezier(.22,1,.36,1);
+    }
+    .btn-primary:hover { background: var(--gold); box-shadow: 0 4px 24px rgba(196,168,85,0.35); transform: translateY(-1px); }
+    .btn-primary:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-premium {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 0.875rem 2rem; background: linear-gradient(135deg, #b8912a 0%, var(--gold) 50%, #d4bb77 100%);
+      color: #fff; font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.13em; text-transform: uppercase;
+      border-radius: 9999px; border: none; cursor: pointer; text-decoration: none;
+      box-shadow: 0 4px 20px rgba(196,168,85,0.38), 0 1px 4px rgba(184,145,42,0.25);
+      transition: box-shadow 0.25s cubic-bezier(.22,1,.36,1), transform 0.18s cubic-bezier(.22,1,.36,1), filter 0.25s;
+    }
+    .btn-premium:hover { filter: brightness(1.08); box-shadow: 0 8px 32px rgba(196,168,85,0.5); transform: translateY(-1px); }
+    .btn-premium:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+    .btn-premium:active { transform: translateY(0); }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 0.875rem 2rem; background: transparent; color: var(--teal);
+      font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.13em; text-transform: uppercase;
+      border-radius: 9999px; border: 1.5px solid rgba(45,112,112,0.3); cursor: pointer; text-decoration: none;
+      transition: background 0.25s cubic-bezier(.22,1,.36,1), border-color 0.25s, transform 0.18s cubic-bezier(.22,1,.36,1);
+    }
+    .btn-ghost:hover { background: rgba(45,112,112,0.06); border-color: var(--teal); transform: translateY(-1px); }
+    .btn-ghost:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+    .btn-ghost:active { transform: translateY(0); }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(247,243,237,0.92);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(45,112,112,0.08);
+    }
+    .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 68px; }
+    .nav-logo { display: flex; align-items: center; gap: 0.625rem; text-decoration: none; }
+    .nav-logo span { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--teal-dark); letter-spacing: -0.02em; }
+    .nav-link { font-size: 0.8125rem; font-weight: 500; color: #555; text-decoration: none; letter-spacing: 0.03em; transition: color 0.2s; }
+    .nav-link:hover { color: var(--teal); }
+    .nav-links { display: flex; align-items: center; gap: 2rem; }
+
+    /* ── SCREENS ── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── HERO ── */
+    #screen-intro {
+      background:
+        radial-gradient(ellipse 70% 80% at 75% 50%, rgba(45,112,112,0.11) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 50% at 15% 80%, rgba(196,168,85,0.07) 0%, transparent 55%),
+        var(--ivory);
+    }
+    .hero-grid { max-width: 1200px; margin: 0 auto; padding: 5rem 2rem 6rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+    @media (max-width: 768px) { .hero-grid { grid-template-columns: 1fr; gap: 3rem; padding: 3rem 1.25rem 4rem; } }
+
+    .tag { display: inline-block; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); background: rgba(196,168,85,0.12); padding: 0.3rem 0.75rem; border-radius: 9999px; }
+
+    /* ── MOCK CARD PREVIEW ── */
+    .preview-stack { position: relative; width: 100%; max-width: 400px; margin: 0 auto; }
+    .preview-card-back {
+      position: absolute; top: 12px; left: 12px; right: -12px;
+      background: #fff; border-radius: 1.25rem; height: 300px;
+      box-shadow: 0 4px 24px rgba(30,60,60,0.08);
+      opacity: 0.5;
+    }
+    .preview-card-mid {
+      position: absolute; top: 6px; left: 6px; right: -6px;
+      background: #fff; border-radius: 1.25rem; height: 300px;
+      box-shadow: 0 4px 28px rgba(30,60,60,0.1);
+      opacity: 0.75;
+    }
+    .preview-card-front {
+      position: relative; background: #fff; border-radius: 1.25rem; overflow: hidden;
+      box-shadow: 0 12px 48px rgba(30,60,60,0.15), 0 2px 12px rgba(30,60,60,0.08);
+    }
+    .preview-images { display: grid; grid-template-columns: 1fr 1fr; }
+    .preview-img-wrap { position: relative; overflow: hidden; }
+    .preview-img-wrap img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .preview-img-wrap .overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(20,50,50,0.55) 0%, transparent 55%); }
+    .preview-label { position: absolute; bottom: 0.625rem; left: 0.75rem; font-size: 0.625rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #fff; }
+    .preview-info { padding: 1rem 1.125rem; display: flex; align-items: center; justify-content: space-between; }
+    .preview-actions { display: flex; align-items: center; gap: 0.75rem; }
+    .preview-skip-btn { width: 42px; height: 42px; border-radius: 50%; border: 1.5px solid rgba(45,112,112,0.2); background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #888; transition: border-color 0.2s, color 0.2s; }
+    .preview-star-btn { width: 52px; height: 52px; border-radius: 50%; background: var(--gold); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; box-shadow: 0 4px 20px rgba(196,168,85,0.4); transition: transform 0.2s, box-shadow 0.2s; }
+
+    /* ── STARRING APP ── */
+    #screen-app { background: var(--ivory); min-height: calc(100vh - 68px); }
+    .app-container { max-width: 680px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    /* Progress */
+    .progress-bar-wrap { background: rgba(45,112,112,0.1); border-radius: 9999px; height: 6px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--gold)); border-radius: 9999px; transition: width 0.4s cubic-bezier(.22,1,.36,1); }
+
+    /* Card */
+    .card-wrap { position: relative; perspective: 1000px; }
+    .ba-card {
+      background: #fff;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 12px 48px rgba(30,60,60,0.13), 0 2px 12px rgba(30,60,60,0.07);
+      transition: transform 0.35s cubic-bezier(.22,1,.36,1), opacity 0.35s cubic-bezier(.22,1,.36,1);
+    }
+    .ba-card.leaving-star {
+      transform: translateY(-60px) scale(0.94) rotate(-3deg);
+      opacity: 0;
+    }
+    .ba-card.leaving-skip {
+      transform: translateY(60px) scale(0.94) rotate(2deg);
+      opacity: 0;
+    }
+    .ba-card.entering {
+      animation: cardEnter 0.45s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes cardEnter {
+      from { transform: translateY(40px) scale(0.97); opacity: 0; }
+      to   { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .ba-images { display: grid; grid-template-columns: 1fr 1fr; }
+    .ba-img-side { position: relative; overflow: hidden; }
+    .ba-img-side img { width: 100%; height: 320px; object-fit: cover; display: block; transition: transform 0.4s cubic-bezier(.22,1,.36,1); }
+    .ba-img-side:hover img { transform: scale(1.03); }
+    .ba-img-side .img-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,40,40,0.6) 0%, transparent 50%); pointer-events: none; }
+    .ba-img-side .img-color-layer { position: absolute; inset: 0; background: rgba(45,112,112,0.05); mix-blend-mode: multiply; pointer-events: none; }
+    .ba-label {
+      position: absolute; bottom: 0.875rem; left: 0.875rem;
+      font-size: 0.625rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: #fff;
+      background: rgba(255,255,255,0.15); backdrop-filter: blur(6px);
+      padding: 0.2rem 0.6rem; border-radius: 0.375rem;
+    }
+    .ba-label.after { background: rgba(45,112,112,0.75); }
+
+    .card-divider { width: 3px; background: var(--ivory); position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); z-index: 2; }
+
+    .ba-footer { padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .ba-procedure { }
+    .ba-procedure-type { font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.2rem; }
+    .ba-procedure-name { font-family: 'Playfair Display', serif; font-size: 1.125rem; font-weight: 600; color: var(--deep); }
+
+    /* Action buttons */
+    .action-row { display: flex; align-items: center; justify-content: center; gap: 1.5rem; margin-top: 2rem; }
+    .skip-btn {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: #fff; border: 1.5px solid rgba(45,112,112,0.18);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #999;
+      box-shadow: 0 2px 16px rgba(30,60,60,0.08);
+      transition: border-color 0.2s cubic-bezier(.22,1,.36,1), color 0.2s, transform 0.18s cubic-bezier(.22,1,.36,1), box-shadow 0.2s;
+    }
+    .skip-btn:hover { border-color: var(--teal); color: var(--teal); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(30,60,60,0.12); }
+    .skip-btn:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+    .skip-btn:active { transform: translateY(0); }
+
+    .star-btn {
+      width: 76px; height: 76px; border-radius: 50%;
+      background: var(--gold); border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #fff;
+      box-shadow: 0 6px 32px rgba(196,168,85,0.45), 0 2px 8px rgba(196,168,85,0.2);
+      transition: background 0.2s cubic-bezier(.22,1,.36,1), transform 0.18s cubic-bezier(.22,1,.36,1), box-shadow 0.2s;
+    }
+    .star-btn:hover { background: var(--gold-light); transform: scale(1.08); box-shadow: 0 8px 40px rgba(196,168,85,0.55); }
+    .star-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+    .star-btn:active { transform: scale(0.96); }
+
+    /* Star burst animation */
+    @keyframes starBurst {
+      0%   { transform: scale(0.8); opacity: 1; }
+      60%  { transform: scale(1.6); opacity: 0.7; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+    .star-burst {
+      position: fixed; pointer-events: none; z-index: 200;
+      width: 80px; height: 80px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(196,168,85,0.6) 0%, transparent 70%);
+      animation: starBurst 0.5s cubic-bezier(.22,1,.36,1) forwards;
+    }
+
+    /* Milestone toast */
+    .milestone-toast {
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      background: var(--deep); color: #fff; border-radius: 1rem;
+      padding: 1.25rem 1.75rem; min-width: 320px; max-width: 480px; width: calc(100vw - 3rem);
+      box-shadow: 0 12px 48px rgba(15,35,35,0.35), 0 2px 12px rgba(15,35,35,0.15);
+      z-index: 300;
+      animation: toastIn 0.5s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    .milestone-toast.hiding {
+      animation: toastOut 0.35s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    @keyframes toastOut {
+      to { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    }
+
+    /* Matches CTA bar (sticky, appears after 25 stars) */
+    .matches-bar {
+      position: sticky; top: 68px; z-index: 80;
+      background: var(--teal);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 0.75rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      animation: slideDown 0.4s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+    .matches-bar p { font-size: 0.875rem; color: rgba(255,255,255,0.85); font-weight: 500; }
+    .matches-bar p strong { color: #fff; font-weight: 700; }
+    .matches-bar-btn {
+      flex-shrink: 0; padding: 0.5rem 1.25rem;
+      background: var(--gold); color: #fff; border: none; border-radius: 9999px;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; white-space: nowrap;
+      transition: background 0.2s, transform 0.18s cubic-bezier(.22,1,.36,1);
+      box-shadow: 0 2px 12px rgba(196,168,85,0.4);
+    }
+    .matches-bar-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+    .matches-bar-btn:active { transform: translateY(0); }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 4rem 2rem; }
+
+    /* ── RESULTS SCREEN ── */
+    #screen-results { background: var(--ivory); min-height: calc(100vh - 68px); }
+    .results-container { max-width: 760px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+    .results-header { text-align: center; margin-bottom: 3rem; }
+
+    .surgeon-result {
+      background: #fff; border-radius: 1.25rem; overflow: hidden;
+      box-shadow: 0 4px 28px rgba(30,60,60,0.09), 0 1px 6px rgba(30,60,60,0.05);
+      margin-bottom: 1.25rem;
+      transition: transform 0.3s cubic-bezier(.22,1,.36,1), box-shadow 0.3s cubic-bezier(.22,1,.36,1);
+      animation: resultIn 0.5s cubic-bezier(.22,1,.36,1) both;
+    }
+    .surgeon-result:hover { transform: translateY(-3px); box-shadow: 0 10px 40px rgba(30,60,60,0.13), 0 2px 10px rgba(30,60,60,0.07); }
+    @keyframes resultIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .surgeon-result:nth-child(1) { animation-delay: 0.05s; }
+    .surgeon-result:nth-child(2) { animation-delay: 0.12s; }
+    .surgeon-result:nth-child(3) { animation-delay: 0.19s; }
+    .surgeon-result:nth-child(4) { animation-delay: 0.26s; }
+    .surgeon-result:nth-child(5) { animation-delay: 0.33s; }
+
+    .result-inner { display: flex; align-items: center; gap: 1.25rem; padding: 1.375rem 1.5rem; }
+    .result-rank {
+      flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700;
+    }
+    .rank-1 { background: var(--gold); color: #fff; box-shadow: 0 4px 16px rgba(196,168,85,0.4); }
+    .rank-2 { background: var(--teal); color: #fff; }
+    .rank-3 { background: var(--teal-light); color: #fff; }
+    .rank-other { background: rgba(45,112,112,0.1); color: var(--teal); }
+
+    .result-photo { flex-shrink: 0; width: 60px; height: 60px; border-radius: 50%; overflow: hidden; }
+    .result-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .result-info { flex: 1; min-width: 0; }
+    .result-name { font-family: 'Playfair Display', serif; font-size: 1.0625rem; font-weight: 600; color: var(--deep); margin-bottom: 0.2rem; }
+    .result-meta { font-size: 0.8125rem; color: #777; }
+    .result-stars { flex-shrink: 0; text-align: right; }
+    .result-star-count { font-family: 'Playfair Display', serif; font-size: 1.375rem; font-weight: 700; color: var(--gold); line-height: 1; }
+    .result-star-label { font-size: 0.6875rem; color: #999; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.2rem; }
+    .result-action { padding: 0 1.5rem 1.375rem; }
+
+    /* Divider */
+    .divider { width: 48px; height: 2px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+
+    /* No results below rank 5 in list */
+    .no-more { text-align: center; padding: 2rem 0 0; color: #aaa; font-size: 0.875rem; }
+
+    /* Scroll fade-in */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(.22,1,.36,1) both; }
+    .d1 { animation-delay: 0.1s; }
+    .d2 { animation-delay: 0.2s; }
+    .d3 { animation-delay: 0.3s; }
+    .d4 { animation-delay: 0.4s; }
+
+    /* ── PROCEDURE PICKER ── */
+    #screen-procedure { background: var(--ivory); min-height: calc(100vh - 68px); }
+    .proc-container { max-width: 720px; margin: 0 auto; padding: 2.5rem 1.5rem 7rem; }
+
+    /* Distance filter */
+    .dist-filter-wrap {
+      background: #fff; border-radius: 1rem; padding: 1.125rem 1.375rem;
+      border: 1.5px solid rgba(45,112,112,0.14);
+      margin-bottom: 2rem;
+      transition: border-color 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s cubic-bezier(.22,1,.36,1);
+    }
+    .dist-filter-wrap.active {
+      border-color: var(--teal);
+      box-shadow: 0 4px 20px rgba(45,112,112,0.1);
+    }
+    .dist-filter-header {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .dist-filter-label-wrap { display: flex; align-items: center; gap: 0.625rem; }
+    .dist-filter-icon {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--teal-faint); display: flex; align-items: center; justify-content: center;
+      color: var(--teal); flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .dist-filter-wrap.active .dist-filter-icon { background: var(--teal); color: #fff; }
+    .dist-filter-title { font-size: 0.9375rem; font-weight: 600; color: var(--deep); }
+    .dist-filter-sub { font-size: 0.75rem; color: #999; margin-top: 0.1rem; }
+
+    /* Toggle switch */
+    .dist-toggle {
+      position: relative; width: 44px; height: 26px; flex-shrink: 0;
+      cursor: pointer;
+    }
+    .dist-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .dist-toggle-track {
+      position: absolute; inset: 0; border-radius: 9999px;
+      background: rgba(45,112,112,0.15);
+      transition: background 0.25s cubic-bezier(.22,1,.36,1);
+    }
+    .dist-toggle input:checked ~ .dist-toggle-track { background: var(--teal); }
+    .dist-toggle-thumb {
+      position: absolute; top: 3px; left: 3px;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+      transition: transform 0.25s cubic-bezier(.22,1,.36,1);
+    }
+    .dist-toggle input:checked ~ .dist-toggle-thumb { transform: translateX(18px); }
+
+    /* Distance options */
+    .dist-options {
+      margin-top: 1rem; padding-top: 1rem;
+      border-top: 1px solid rgba(45,112,112,0.09);
+      display: flex; flex-direction: column; gap: 0.875rem;
+      animation: distExpand 0.3s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes distExpand {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Slider row */
+    .dist-slider-row {
+      display: flex; align-items: center; gap: 0.875rem;
+    }
+    .dist-slider-value {
+      flex-shrink: 0; min-width: 80px; text-align: right;
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 700; color: var(--teal);
+      letter-spacing: -0.02em;
+    }
+    .dist-slider-value.unlimited { color: var(--gold); }
+
+    /* Custom range input */
+    .dist-range {
+      -webkit-appearance: none; appearance: none;
+      flex: 1; height: 6px; border-radius: 9999px;
+      background: var(--ivory-dark);
+      outline: none; cursor: pointer;
+    }
+    .dist-range::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 2px 8px rgba(45,112,112,0.35);
+      cursor: grab;
+      transition: background 0.2s, transform 0.15s cubic-bezier(.22,1,.36,1), box-shadow 0.2s;
+    }
+    .dist-range::-webkit-slider-thumb:active { cursor: grabbing; transform: scale(1.15); box-shadow: 0 4px 16px rgba(45,112,112,0.45); }
+    .dist-range::-moz-range-thumb {
+      width: 22px; height: 22px; border-radius: 50%; border: none;
+      background: var(--teal);
+      box-shadow: 0 2px 8px rgba(45,112,112,0.35);
+      cursor: grab;
+      transition: background 0.2s, transform 0.15s cubic-bezier(.22,1,.36,1);
+    }
+    .dist-range:focus-visible { outline: 2px solid var(--teal); outline-offset: 4px; }
+    /* Gold thumb at unlimited */
+    .dist-range.unlimited::-webkit-slider-thumb { background: var(--gold); box-shadow: 0 2px 12px rgba(196,168,85,0.45); }
+    .dist-range.unlimited::-moz-range-thumb    { background: var(--gold); }
+
+    /* Tick labels */
+    .dist-ticks {
+      display: flex; justify-content: space-between;
+      font-size: 0.6875rem; color: #bbb; font-weight: 500;
+      padding: 0 2px;
+    }
+
+    .dist-location-status {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.75rem; font-weight: 500;
+    }
+    .dist-status-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .dist-status-dot.getting { background: var(--gold); animation: pulse 1.2s ease-in-out infinite; }
+    .dist-status-dot.granted { background: #3aaf6e; }
+    .dist-status-dot.denied  { background: #c84040; }
+    @keyframes pulse {
+      0%,100% { opacity: 1; } 50% { opacity: 0.35; }
+    }
+
+    .proc-all-btn {
+      width: 100%; padding: 1rem 1.5rem;
+      background: #fff; border: 2px solid rgba(45,112,112,0.18);
+      border-radius: 1rem; cursor: pointer; text-align: left;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 2rem;
+    }
+    .proc-all-btn:hover { border-color: var(--teal); }
+    .proc-all-btn.selected { background: var(--teal); border-color: var(--teal); }
+    .proc-all-btn.selected .proc-all-title { color: #fff; }
+    .proc-all-btn.selected .proc-all-sub { color: rgba(255,255,255,0.65); }
+    .proc-all-btn.selected .proc-all-check { opacity: 1; }
+    .proc-all-title { font-family: 'Playfair Display', serif; font-size: 1.0625rem; font-weight: 600; color: var(--deep); }
+    .proc-all-sub { font-size: 0.8125rem; color: #888; margin-top: 0.15rem; }
+    .proc-all-check { opacity: 0; transition: opacity 0.2s; }
+
+    .proc-group { margin-bottom: 1.75rem; }
+    .proc-group-header {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 0.875rem; cursor: pointer; width: fit-content;
+    }
+    .proc-group-header:hover .proc-group-label { color: var(--teal); }
+    .proc-group-label {
+      font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: #aaa;
+      transition: color 0.2s;
+    }
+    .proc-group-label.active { color: var(--teal); }
+    .proc-group-line { flex: 1; height: 1px; background: rgba(45,112,112,0.1); }
+    .proc-group-all-chip {
+      font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--teal); background: var(--teal-faint); padding: 0.2rem 0.625rem;
+      border-radius: 9999px; cursor: pointer; border: 1.5px solid transparent;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .proc-group-all-chip:hover { background: var(--teal); color: #fff; }
+    .proc-group-all-chip.selected { background: var(--teal); color: #fff; }
+
+    .proc-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .proc-chip {
+      padding: 0.5rem 1.125rem; border-radius: 9999px;
+      border: 1.5px solid rgba(45,112,112,0.18); background: #fff;
+      color: #555; font-size: 0.8125rem; font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.15s cubic-bezier(.22,1,.36,1), box-shadow 0.2s;
+    }
+    .proc-chip:hover { border-color: var(--teal); color: var(--teal); transform: translateY(-1px); box-shadow: 0 3px 12px rgba(45,112,112,0.12); }
+    .proc-chip:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+    .proc-chip.selected { background: var(--teal); border-color: var(--teal); color: #fff; box-shadow: 0 3px 16px rgba(45,112,112,0.25); }
+    .proc-chip.selected:hover { background: var(--teal-light); border-color: var(--teal-light); transform: translateY(-1px); }
+
+    .proc-sticky-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
+      background: rgba(247,243,237,0.96); backdrop-filter: blur(14px);
+      border-top: 1px solid rgba(45,112,112,0.1);
+      padding: 1rem 2rem;
+      display: flex; align-items: center; justify-content: center; gap: 1rem;
+    }
+    .proc-sticky-inner { max-width: 720px; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .proc-selected-label { font-size: 0.875rem; color: #777; }
+    .proc-selected-label strong { color: var(--deep); font-weight: 600; }
+
+    /* ── SURGEON PORTAL ── */
+    #screen-surgeon-login { background: var(--ivory); min-height: calc(100vh - 68px); align-items:center; justify-content:center; padding: 2rem; }
+    #screen-surgeon-login.active { display:flex; }
+    .login-card {
+      background: #fff; border-radius: 1.5rem; padding: 2.75rem 2.5rem;
+      width: 100%; max-width: 420px;
+      box-shadow: 0 12px 48px rgba(30,60,60,0.12), 0 2px 12px rgba(30,60,60,0.07);
+    }
+    .form-label { display:block; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#777; margin-bottom:0.5rem; }
+    .form-input {
+      width:100%; padding:0.8125rem 1rem; border:1.5px solid rgba(45,112,112,0.18);
+      border-radius:0.75rem; font-family:'Inter',sans-serif; font-size:0.9375rem; color:#1A3A3A;
+      background:#fff; outline:none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-input:focus { border-color:var(--teal); box-shadow:0 0 0 3px rgba(45,112,112,0.1); }
+    .form-input::placeholder { color:#bbb; }
+    .form-group { margin-bottom:1.25rem; }
+
+    /* Dashboard */
+    #screen-surgeon-dashboard { background: var(--ivory); min-height:calc(100vh - 68px); }
+    .dash-header {
+      background:#fff; border-bottom:1px solid rgba(45,112,112,0.08);
+      padding:0 2rem; display:flex; align-items:center; justify-content:space-between; height:60px;
+      position:sticky; top:68px; z-index:70;
+    }
+    .dash-surgeon-name { font-family:'Playfair Display',serif; font-size:0.9375rem; font-weight:600; color:var(--deep); }
+    .dash-role { font-size:0.6875rem; color:#aaa; letter-spacing:0.1em; text-transform:uppercase; margin-top:1px; }
+    .dash-logout { font-size:0.8125rem; color:#aaa; background:none; border:none; cursor:pointer; font-weight:500; transition:color 0.2s; }
+    .dash-logout:hover { color:var(--teal); }
+
+    .dash-tabs { display:flex; gap:0; border-bottom:1px solid rgba(45,112,112,0.1); background:#fff; padding:0 2rem; }
+    .dash-tab {
+      padding:0.875rem 1.25rem; font-size:0.8125rem; font-weight:600; color:#aaa;
+      background:none; border:none; border-bottom:2px solid transparent; margin-bottom:-1px;
+      cursor:pointer; letter-spacing:0.04em; display:flex; align-items:center; gap:0.5rem;
+      transition:color 0.2s, border-color 0.2s;
+    }
+    .dash-tab:hover { color:var(--teal); }
+    .dash-tab.active { color:var(--teal); border-bottom-color:var(--teal); }
+    .dash-tab .tab-badge {
+      background:var(--gold); color:#fff; font-size:0.625rem; font-weight:700;
+      border-radius:9999px; padding:0.1rem 0.4rem; min-width:18px; text-align:center;
+    }
+
+    .dash-body { max-width:960px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+    .dash-section-title { font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:700; color:var(--deep); margin-bottom:0.35rem; }
+    .dash-section-sub { font-size:0.875rem; color:#888; margin-bottom:1.75rem; }
+
+    /* Deposit form */
+    .deposit-form-wrap {
+      background:#fff; border-radius:1.25rem; overflow:hidden;
+      box-shadow:0 4px 24px rgba(30,60,60,0.08), 0 1px 6px rgba(30,60,60,0.04);
+      margin-bottom:2rem;
+    }
+    .deposit-form-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:1.125rem 1.5rem; cursor:pointer;
+      transition:background 0.2s;
+    }
+    .deposit-form-header:hover { background:rgba(45,112,112,0.03); }
+    .deposit-form-body { padding:0 1.5rem 1.5rem; border-top:1px solid rgba(45,112,112,0.08); }
+    .deposit-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    @media(max-width:600px){.deposit-grid{grid-template-columns:1fr;}}
+
+    /* Image library grid */
+    .library-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1.25rem; }
+    .lib-card {
+      background:#fff; border-radius:1.125rem; overflow:hidden;
+      box-shadow:0 3px 20px rgba(30,60,60,0.08), 0 1px 4px rgba(30,60,60,0.04);
+    }
+    .lib-images { display:grid; grid-template-columns:1fr 1fr; }
+    .lib-img { width:100%; height:100px; object-fit:cover; display:block; }
+    .lib-footer { padding:0.875rem 1rem; display:flex; align-items:center; justify-content:space-between; }
+    .lib-proc { font-size:0.875rem; font-weight:600; color:var(--deep); }
+    .lib-cat { font-size:0.6875rem; color:var(--gold); font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-top:0.15rem; }
+    .lib-delete { width:28px; height:28px; border-radius:50%; background:rgba(200,50,50,0.08); border:none; cursor:pointer; color:#c83232; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.2s; }
+    .lib-delete:hover { background:rgba(200,50,50,0.18); }
+    .lib-badge { font-size:0.625rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#fff; background:var(--teal); padding:0.15rem 0.5rem; border-radius:0.3rem; }
+
+    /* Lead cards */
+    .lead-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:2rem; }
+    .lead-stat { background:#fff; border-radius:1rem; padding:1.25rem 1.5rem; box-shadow:0 2px 16px rgba(30,60,60,0.07); text-align:center; }
+    .lead-stat-num { font-family:'Playfair Display',serif; font-size:1.75rem; font-weight:700; color:var(--teal); letter-spacing:-0.03em; }
+    .lead-stat-label { font-size:0.75rem; color:#888; margin-top:0.25rem; font-weight:500; }
+
+    .lead-card {
+      background:#fff; border-radius:1.125rem; padding:1.25rem 1.5rem;
+      box-shadow:0 3px 20px rgba(30,60,60,0.08); margin-bottom:1rem;
+      display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap;
+      animation: resultIn 0.4s cubic-bezier(.22,1,.36,1) both;
+    }
+    .lead-rank-badge {
+      flex-shrink:0; width:40px; height:40px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Playfair Display',serif; font-size:1rem; font-weight:700;
+    }
+    .lead-info { flex:1; min-width:160px; }
+    .lead-email { font-size:0.9375rem; font-weight:600; color:var(--deep); }
+    .lead-meta { font-size:0.8125rem; color:#888; margin-top:0.2rem; }
+    .lead-action { flex-shrink:0; }
+    .email-btn {
+      display:inline-flex; align-items:center; gap:0.4rem;
+      padding:0.5rem 1rem; background:var(--teal-faint); color:var(--teal);
+      border-radius:9999px; font-size:0.75rem; font-weight:700; letter-spacing:0.08em;
+      text-transform:uppercase; text-decoration:none; border:none; cursor:pointer;
+      transition:background 0.2s, color 0.2s;
+    }
+    .email-btn:hover { background:var(--teal); color:#fff; }
+
+    /* Mobile tweaks */
+    @media (max-width: 540px) {
+      .ba-images { grid-template-columns: 1fr 1fr; }
+      .ba-img-side img { height: 220px; }
+      .result-inner { gap: 0.875rem; padding: 1rem 1.125rem; }
+      .result-photo { width: 48px; height: 48px; }
+      .lead-stats { grid-template-columns: 1fr 1fr; }
+      .login-card { padding: 2rem 1.5rem; }
+    }
+
+    /* ── MEMBER LOGIN MODAL ── */
+    #member-modal-backdrop {
+      position: fixed; inset: 0; z-index: 900;
+      background: rgba(26,58,58,0.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s cubic-bezier(.22,1,.36,1);
+    }
+    #member-modal-backdrop.open { opacity: 1; pointer-events: all; }
+    #member-modal {
+      background: #fff; border-radius: 1.75rem; padding: 2.75rem 2.5rem;
+      width: 100%; max-width: 440px; position: relative;
+      box-shadow: 0 24px 80px rgba(30,60,60,0.22), 0 4px 16px rgba(30,60,60,0.1);
+      transform: translateY(20px) scale(0.97);
+      transition: transform 0.3s cubic-bezier(.22,1,.36,1);
+    }
+    #member-modal-backdrop.open #member-modal { transform: translateY(0) scale(1); }
+    .member-modal-close {
+      position: absolute; top: 1.25rem; right: 1.25rem;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--ivory); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #999; transition: background 0.18s, color 0.18s;
+    }
+    .member-modal-close:hover { background: var(--ivory-dark); color: var(--deep); }
+    .member-tab-bar { display: flex; gap: 0; margin-bottom: 1.75rem; border-bottom: 2px solid var(--ivory-dark); }
+    .member-tab {
+      flex: 1; padding: 0.625rem; font-size: 0.8125rem; font-weight: 600;
+      background: none; border: none; cursor: pointer; color: #aaa;
+      border-bottom: 2px solid transparent; margin-bottom: -2px;
+      transition: color 0.18s, border-color 0.18s;
+    }
+    .member-tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+    .member-tab:hover:not(.active) { color: var(--deep); }
+    .member-premium-badge {
+      display: inline-flex; align-items: center; gap: 0.375rem;
+      background: linear-gradient(135deg,#b8912a,var(--gold));
+      color: #fff; font-size: 0.6875rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.3rem 0.75rem; border-radius: 9999px; margin-bottom: 0.875rem;
+    }
+  </style>
+</head>
+<body class="font-body bg-ivory antialiased overflow-x-hidden">
+
+  <!-- ==================== MEMBER LOGIN MODAL ==================== -->
+  <div id="member-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="member-modal-title" onclick="if(event.target===this)closeMemberModal()">
+    <div id="member-modal">
+
+      <button class="member-modal-close" onclick="closeMemberModal()" aria-label="Close">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+
+      <!-- Header -->
+      <div style="text-align:center;margin-bottom:1.5rem;">
+        <div style="display:inline-flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+          <svg width="24" height="21" viewBox="0 0 36 32" fill="none" aria-hidden="true">
+            <path d="M18 4L3 4L11 20L18 28L25 20L33 4Z" fill="#2D7070"/>
+            <path d="M18 4L25 4L33 4L26 14L18 28Z" fill="#1F5555" opacity="0.55"/>
+            <path d="M16 4L18 4L18 10L14 4Z" fill="#C4A855"/>
+          </svg>
+          <span class="font-display" style="font-size:1.125rem;font-weight:700;color:var(--teal-dark);letter-spacing:-0.02em;">VUE</span>
+        </div>
+        <div class="member-premium-badge">
+          <svg width="11" height="11" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+          Members Only
+        </div>
+        <h2 class="font-display" id="member-modal-title" style="font-size:1.375rem;font-weight:700;color:var(--deep);letter-spacing:-0.03em;margin-bottom:0.375rem;">Premium Search</h2>
+        <p style="font-size:0.875rem;color:#999;line-height:1.55;">Sign in or create a free account to access photo-match search.</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="member-tab-bar">
+        <button class="member-tab active" id="mtab-signin" onclick="switchMemberTab('signin')">Sign In</button>
+        <button class="member-tab" id="mtab-signup" onclick="switchMemberTab('signup')">Create Account</button>
+      </div>
+
+      <!-- Sign In form -->
+      <form id="member-signin-form" onsubmit="memberSignIn(event)">
+        <div class="form-group">
+          <label class="form-label" for="member-signin-email">Email</label>
+          <input class="form-input" type="email" id="member-signin-email" placeholder="you@email.com" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="member-signin-password">Password</label>
+          <input class="form-input" type="password" id="member-signin-password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        <div id="member-signin-error" style="display:none;background:rgba(200,50,50,0.08);color:#c83232;font-size:0.8125rem;padding:0.625rem 0.875rem;border-radius:0.625rem;margin-bottom:1rem;"></div>
+        <button type="submit" class="btn-premium" style="width:100%;justify-content:center;padding:0.9375rem;font-size:0.875rem;margin-bottom:0.875rem;">
+          Sign In &amp; Search
+        </button>
+        <p style="font-size:0.75rem;color:#ccc;text-align:center;">
+          Don't have an account? <button type="button" onclick="switchMemberTab('signup')" style="background:none;border:none;color:var(--teal);font-size:0.75rem;font-weight:600;cursor:pointer;padding:0;">Create one free →</button>
+        </p>
+      </form>
+
+      <!-- Sign Up form -->
+      <form id="member-signup-form" onsubmit="memberSignUp(event)" style="display:none;">
+        <div class="form-group">
+          <label class="form-label" for="member-signup-name">Full Name</label>
+          <input class="form-input" type="text" id="member-signup-name" placeholder="Your name" required autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="member-signup-email">Email</label>
+          <input class="form-input" type="email" id="member-signup-email" placeholder="you@email.com" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="member-signup-password">Password <span style="font-weight:400;color:#bbb;text-transform:none;letter-spacing:0;">(min 6 chars)</span></label>
+          <input class="form-input" type="password" id="member-signup-password" placeholder="••••••••" required minlength="6" autocomplete="new-password" />
+        </div>
+        <div id="member-signup-error" style="display:none;background:rgba(200,50,50,0.08);color:#c83232;font-size:0.8125rem;padding:0.625rem 0.875rem;border-radius:0.625rem;margin-bottom:1rem;"></div>
+        <button type="submit" class="btn-premium" style="width:100%;justify-content:center;padding:0.9375rem;font-size:0.875rem;margin-bottom:0.875rem;">
+          Create Account &amp; Search
+        </button>
+        <p style="font-size:0.75rem;color:#ccc;text-align:center;">
+          Already a member? <button type="button" onclick="switchMemberTab('signin')" style="background:none;border:none;color:var(--teal);font-size:0.75rem;font-weight:600;cursor:pointer;padding:0;">Sign in →</button>
+        </p>
+      </form>
+
+    </div>
+  </div><!-- /member-modal -->
+
+
+  <!-- Loading overlay — shown while surgeon-images.json is fetching -->
+  <div id="loading-overlay" style="position:fixed;inset:0;background:#F7F3ED;z-index:999;display:flex;align-items:center;justify-content:center;transition:opacity 0.3s;">
+    <div style="text-align:center;">
+      <svg width="40" height="36" viewBox="0 0 36 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin:0 auto 1rem;display:block;animation:logopulse 1.6s ease-in-out infinite;" aria-hidden="true">
+        <path d="M18 4L3 4L11 20L18 28L25 20L33 4Z" fill="#2D7070"/>
+        <path d="M18 4L25 4L33 4L26 14L18 28Z" fill="#1F5555" opacity="0.55"/>
+        <path d="M16 4L18 4L18 10L14 4Z" fill="#C4A855"/>
+      </svg>
+      <p style="font-family:'Playfair Display',serif;font-size:1rem;color:#2D7070;font-weight:600;letter-spacing:-0.01em;">Loading image library…</p>
+    </div>
+  </div>
+  <style>@keyframes logopulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.55;transform:scale(0.93)}}</style>
+
+  <!-- ==================== NAV ==================== -->
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-logo" href="#" onclick="showScreen('intro'); return false;" aria-label="VUE Home">
+        <svg width="32" height="28" viewBox="0 0 36 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M18 4L3 4L11 20L18 28L25 20L33 4Z" fill="#2D7070"/>
+          <path d="M18 4L25 4L33 4L26 14L18 28Z" fill="#1F5555" opacity="0.55"/>
+          <path d="M16 4L18 4L18 10L14 4Z" fill="#C4A855"/>
+          <path d="M18 4L20 4L22 4L18 10Z" fill="#D4BB77" opacity="0.8"/>
+        </svg>
+        <span>VUE</span>
+      </a>
+      <div class="nav-links" id="nav-links">
+        <!-- Dynamically updated -->
+      </div>
+      <div style="display:flex;align-items:center;gap:0.875rem;">
+        <span id="nav-star-count" style="font-size:0.8125rem;color:var(--teal);font-weight:600;display:none;">
+          <span id="nav-count-num">0</span> starred
+        </span>
+        <button onclick="showScreen('surgeon-login')" style="padding:0.5rem 1rem;background:transparent;border:1.5px solid rgba(45,112,112,0.22);border-radius:9999px;font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:600;color:var(--teal);cursor:pointer;letter-spacing:0.04em;transition:background 0.2s,border-color 0.2s,color 0.2s;" onmouseover="this.style.background='rgba(45,112,112,0.06)';this.style.borderColor='var(--teal)'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(45,112,112,0.22)'" id="nav-surgeon-btn">
+          Surgeon Portal
+        </button>
+        <button class="btn-primary" id="nav-cta" onclick="showScreen('app')" style="padding:0.6rem 1.375rem;font-size:0.75rem;">
+          Start Exploring
+        </button>
+      </div>
+    </div>
+  </nav>
+
+
+  <!-- ==================== SCREEN: INTRO ==================== -->
+  <div id="screen-intro" class="screen active">
+
+    <!-- Hero -->
+    <div class="hero-grid grain" style="position:relative;">
+      <div>
+        <div class="tag fade-up" style="margin-bottom:1.25rem;">A New Way to Choose</div>
+        <h1 class="font-display fade-up d1" style="font-size:clamp(2.5rem,5vw,3.75rem);font-weight:700;line-height:1.08;letter-spacing:-0.04em;color:var(--deep);margin-bottom:1.25rem;">
+          Star What You Love.<br/>
+          <em style="color:var(--teal);font-style:italic;">Meet Your Surgeon.</em>
+        </h1>
+        <p class="fade-up d2" style="font-size:1rem;line-height:1.75;color:#666;max-width:420px;margin-bottom:2rem;">
+          Browse real before-and-after results. Star the outcomes that resonate with you. After 25 stars, VUE reveals the top surgeons behind your favorites — ranked by how many times you starred their work.
+        </p>
+
+        <!-- Steps -->
+        <div class="fade-up d3" style="display:flex;flex-direction:column;gap:0.875rem;margin-bottom:2.25rem;">
+          <div style="display:flex;align-items:flex-start;gap:0.875rem;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;margin-top:1px;">1</div>
+            <p style="font-size:0.9375rem;color:#555;line-height:1.5;padding-top:4px;">Browse before-and-after images. <strong style="color:var(--deep);">Star</strong> the results you love.</p>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:0.875rem;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;margin-top:1px;">2</div>
+            <p style="font-size:0.9375rem;color:#555;line-height:1.5;padding-top:4px;">Every <strong style="color:var(--deep);">25 stars</strong>, choose to keep going or check your matches — the more you star, the sharper your results.</p>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:0.875rem;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;margin-top:1px;">3</div>
+            <p style="font-size:0.9375rem;color:#555;line-height:1.5;padding-top:4px;">See your <strong style="color:var(--deep);">top 3 matched surgeons</strong>, ranked by your stars.</p>
+          </div>
+        </div>
+
+        <div class="fade-up d4" style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+          <button class="btn-primary" onclick="showScreen('procedure')" style="font-size:0.875rem;padding:1rem 2.25rem;">
+            Start Starring
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+          <button class="btn-premium" onclick="openPremiumSearch()" style="font-size:0.875rem;padding:1rem 2.25rem;">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+            Premium Search
+          </button>
+        </div>
+        <p style="font-size:0.8125rem;color:#bbb;margin-top:0.5rem;">No account needed to browse</p>
+      </div>
+
+      <!-- Preview card stack -->
+      <div class="fade-up d2">
+        <div class="preview-stack" style="max-width:380px;">
+          <div class="preview-card-back"></div>
+          <div class="preview-card-mid"></div>
+          <div class="preview-card-front">
+            <div class="preview-images">
+              <div class="preview-img-wrap">
+                <img src="https://placehold.co/280x200/D8D0C8/7A7068?text= " alt="Before result" />
+                <div class="overlay"></div>
+                <span class="preview-label">Before</span>
+              </div>
+              <div class="preview-img-wrap" style="border-left:3px solid var(--ivory);">
+                <img src="https://placehold.co/280x200/C8DDD8/2D6B60?text= " alt="After result" />
+                <div class="overlay"></div>
+                <span class="preview-label" style="background:rgba(45,112,112,0.75);">After</span>
+              </div>
+            </div>
+            <div class="preview-info">
+              <div>
+                <p style="font-size:0.6875rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:0.2rem;">Facial Aesthetics</p>
+                <p class="font-display" style="font-size:1.0625rem;font-weight:600;color:var(--deep);">Rhinoplasty</p>
+              </div>
+              <div class="preview-actions">
+                <button class="preview-skip-btn" aria-label="Skip" tabindex="-1">
+                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+                <button class="preview-star-btn" aria-label="Star" tabindex="-1">
+                  <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Star counter badge on preview -->
+          <div style="position:absolute;top:-0.75rem;right:-0.75rem;background:var(--gold);color:#fff;border-radius:9999px;padding:0.35rem 0.875rem;font-size:0.75rem;font-weight:700;box-shadow:0 4px 16px rgba(196,168,85,0.4);white-space:nowrap;">
+            ★ 12 starred
+          </div>
+        </div>
+
+        <!-- Trust signals below preview -->
+        <div style="display:flex;justify-content:center;gap:2rem;margin-top:2.5rem;flex-wrap:wrap;">
+          <div style="text-align:center;">
+            <p class="font-display" style="font-size:1.5rem;font-weight:700;color:var(--teal);letter-spacing:-0.03em;">2,400<span style="color:var(--gold);">+</span></p>
+            <p style="font-size:0.75rem;color:#888;margin-top:0.15rem;">Board-Certified Surgeons</p>
+          </div>
+          <div style="width:1px;background:rgba(45,112,112,0.12);"></div>
+          <div style="text-align:center;">
+            <p class="font-display" style="font-size:1.5rem;font-weight:700;color:var(--teal);letter-spacing:-0.03em;">150k<span style="color:var(--gold);">+</span></p>
+            <p style="font-size:0.75rem;color:#888;margin-top:0.15rem;">Results Gallery</p>
+          </div>
+          <div style="width:1px;background:rgba(45,112,112,0.12);"></div>
+          <div style="text-align:center;">
+            <p class="font-display" style="font-size:1.5rem;font-weight:700;color:var(--teal);letter-spacing:-0.03em;">98<span style="color:var(--gold);">%</span></p>
+            <p style="font-size:0.75rem;color:#888;margin-top:0.15rem;">Patient Satisfaction</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /screen-intro -->
+
+
+  <!-- ==================== SCREEN: PROCEDURE ==================== -->
+  <div id="screen-procedure" class="screen">
+    <div class="proc-container">
+
+      <!-- Header -->
+      <div style="margin-bottom:2rem;">
+        <button onclick="procBack()" style="display:inline-flex;align-items:center;gap:0.375rem;background:none;border:none;cursor:pointer;font-size:0.8125rem;color:#999;padding:0;margin-bottom:1.5rem;transition:color 0.2s;" onmouseover="this.style.color='var(--teal)'" onmouseout="this.style.color='#999'">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Back
+        </button>
+        <div class="tag" style="margin-bottom:0.75rem;">Procedure</div>
+        <h2 class="font-display" style="font-size:clamp(1.625rem,3.5vw,2.25rem);font-weight:700;color:var(--deep);letter-spacing:-0.035em;margin-bottom:0.5rem;">What are you looking for?</h2>
+        <p style="font-size:0.9375rem;color:#888;line-height:1.6;">Choose a procedure to see before-and-after results from surgeons who specialise in it.</p>
+      </div>
+
+      <!-- Distance Filter -->
+      <div class="dist-filter-wrap" id="dist-filter-wrap">
+        <div class="dist-filter-header">
+          <div class="dist-filter-label-wrap">
+            <div class="dist-filter-icon">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            </div>
+            <div>
+              <p class="dist-filter-title">Near Me</p>
+              <p class="dist-filter-sub" id="dist-filter-sub">Filter surgeons by distance</p>
+            </div>
+          </div>
+          <label class="dist-toggle" aria-label="Enable distance filter">
+            <input type="checkbox" id="dist-toggle-input" onchange="toggleDistanceFilter(this.checked)" />
+            <span class="dist-toggle-track"></span>
+            <span class="dist-toggle-thumb"></span>
+          </label>
+        </div>
+
+        <div class="dist-options" id="dist-options" style="display:none;">
+          <div class="dist-slider-row">
+            <input
+              type="range"
+              id="dist-range-input"
+              class="dist-range"
+              min="0" max="500" step="5" value="25"
+              oninput="onDistanceSlider(this.value)"
+              aria-label="Distance in miles"
+            />
+            <div class="dist-slider-value" id="dist-slider-value">25 mi</div>
+          </div>
+          <div class="dist-ticks" aria-hidden="true">
+            <span>0</span>
+            <span>100 mi</span>
+            <span>200 mi</span>
+            <span>300 mi</span>
+            <span>400 mi</span>
+            <span>Any</span>
+          </div>
+          <div class="dist-location-status" id="dist-location-status" style="display:none;">
+            <span class="dist-status-dot getting" id="dist-status-dot"></span>
+            <span id="dist-status-text" style="color:#888;"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- All Procedures -->
+      <button class="proc-all-btn selected" id="proc-all-btn" onclick="selectProcedure('all')" aria-pressed="true">
+        <div>
+          <p class="proc-all-title">All Procedures</p>
+          <p class="proc-all-sub">Browse everything — widest selection, most surgeons</p>
+        </div>
+        <svg class="proc-all-check" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+      </button>
+
+      <!-- Groups injected by JS -->
+      <div id="proc-groups"></div>
+
+    </div>
+
+    <!-- Sticky CTA bar -->
+    <div class="proc-sticky-bar">
+      <div class="proc-sticky-inner">
+        <div class="proc-selected-label">Browsing: <strong id="proc-selected-display">All Procedures</strong></div>
+        <button class="btn-primary" onclick="startStarring()" style="font-size:0.8125rem;padding:0.875rem 1.75rem;">
+          Start Starring
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div><!-- /screen-procedure -->
+
+
+  <!-- ==================== SCREEN: APP ==================== -->
+  <div id="screen-app" class="screen">
+
+    <!-- Matches bar (hidden until 25 stars) -->
+    <div id="matches-bar" class="matches-bar" style="display:none;">
+      <p>You've starred <strong id="bar-count">25</strong> procedures — ready to meet your matches?</p>
+      <button class="matches-bar-btn" onclick="showScreen('results')">See My Surgeons →</button>
+    </div>
+
+    <div class="app-container">
+
+      <!-- Header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.75rem;">
+        <div>
+          <p class="font-display" style="font-size:1.5rem;font-weight:700;color:var(--deep);letter-spacing:-0.03em;" id="app-procedure-title">Browse Results</p>
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.25rem;">
+            <p style="font-size:0.8125rem;color:#888;" id="app-procedure-sub">All Procedures</p>
+            <span style="color:#ddd;">·</span>
+            <button onclick="showScreen('procedure')" style="font-size:0.8125rem;color:var(--teal);background:none;border:none;cursor:pointer;padding:0;font-weight:600;text-decoration:underline;text-underline-offset:2px;transition:color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--teal)'">Change</button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem;">
+          <div id="star-counter" style="display:flex;align-items:center;gap:0.5rem;background:#fff;border-radius:9999px;padding:0.5rem 1rem;box-shadow:0 2px 12px rgba(30,60,60,0.08);">
+            <svg width="16" height="16" fill="var(--gold)" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span id="count-display" style="font-size:0.875rem;font-weight:700;color:var(--deep);">0</span>
+            <span style="font-size:0.8125rem;color:#999;">starred</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div style="margin-bottom:0.625rem;display:flex;align-items:center;justify-content:space-between;">
+        <span id="progress-label" style="font-size:0.75rem;color:#999;font-weight:500;">0 of 25 to unlock matches</span>
+        <span id="progress-pct" style="font-size:0.75rem;color:var(--teal);font-weight:600;">0%</span>
+      </div>
+      <div class="progress-bar-wrap" style="margin-bottom:2rem;">
+        <div class="progress-bar-fill" id="progress-fill" style="width:0%;"></div>
+      </div>
+
+      <!-- Card area -->
+      <div class="card-wrap" id="card-wrap">
+        <!-- Cards injected here by JS -->
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-row">
+        <button class="skip-btn" id="skip-btn" onclick="handleSkip()" aria-label="Skip this result">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <div style="text-align:center;">
+          <button class="star-btn" id="star-btn" onclick="handleStar()" aria-label="Star this result">
+            <svg width="30" height="30" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </button>
+          <p style="font-size:0.6875rem;color:#bbb;margin-top:0.5rem;letter-spacing:0.08em;text-transform:uppercase;">Star</p>
+        </div>
+        <button class="skip-btn" onclick="handleSkip()" aria-label="Skip this result" style="opacity:0;pointer-events:none;"></button>
+      </div>
+
+      <!-- Keyboard hint -->
+      <p style="text-align:center;font-size:0.75rem;color:#ccc;margin-top:1.25rem;letter-spacing:0.06em;">
+        ← Skip &nbsp;·&nbsp; Space / → Star
+      </p>
+
+    </div>
+  </div><!-- /screen-app -->
+
+
+  <!-- ==================== SCREEN: RESULTS ==================== -->
+  <div id="screen-results" class="screen">
+    <div class="results-container">
+
+      <div class="results-header">
+        <div class="tag" style="margin-bottom:1rem;">Your Matches</div>
+        <h2 class="font-display" style="font-size:clamp(1.875rem,4vw,2.75rem);font-weight:700;color:var(--deep);letter-spacing:-0.04em;margin-bottom:0.75rem;">Your Top Surgeons</h2>
+        <div class="divider" style="margin:0 auto 1rem;"></div>
+        <p style="font-size:0.9375rem;line-height:1.7;color:#666;max-width:480px;margin:0 auto 0.5rem;">
+          Based on <span id="results-total-stars" style="font-weight:700;color:var(--teal);">0</span> starred results, here are the surgeons whose work resonated most with you.
+        </p>
+      </div>
+
+      <div id="results-list">
+        <!-- Injected by JS -->
+      </div>
+
+      <div style="text-align:center;margin-top:3rem;display:flex;flex-direction:column;align-items:center;gap:1rem;">
+        <button class="btn-primary" onclick="showScreen('app')" style="font-size:0.8125rem;">
+          Keep Starring
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </button>
+        <button class="btn-ghost" onclick="resetApp()" style="font-size:0.8125rem;">Start Over</button>
+      </div>
+
+    </div>
+  </div><!-- /screen-results -->
+
+
+  <!-- ==================== SCREEN: PREMIUM SEARCH ==================== -->
+  <div id="screen-premium" class="screen">
+    <div class="proc-container" style="max-width:860px;">
+
+      <!-- Header -->
+      <div style="margin-bottom:2rem;">
+        <button onclick="showScreen('intro')" style="display:inline-flex;align-items:center;gap:0.375rem;background:none;border:none;cursor:pointer;font-size:0.8125rem;color:#999;padding:0;margin-bottom:1.5rem;transition:color 0.2s;" onmouseover="this.style.color='var(--teal)'" onmouseout="this.style.color='#999'">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Back
+        </button>
+        <div style="display:flex;align-items:center;gap:0.625rem;margin-bottom:0.75rem;">
+          <div class="tag">Premium</div>
+          <svg width="14" height="14" fill="var(--gold)" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+        </div>
+        <h2 class="font-display" style="font-size:clamp(1.625rem,3.5vw,2.25rem);font-weight:700;color:var(--deep);letter-spacing:-0.035em;margin-bottom:0.5rem;">Photo Match Search</h2>
+        <p style="font-size:0.9375rem;color:#888;line-height:1.6;max-width:520px;">Upload a photo of yourself. VUE analyzes your features and finds the most visually similar before-and-after results from our surgeon gallery — matched to <em>you</em>.</p>
+      </div>
+
+      <!-- Upload zone -->
+      <div id="premium-upload-zone" style="border:2px dashed rgba(45,112,112,0.3);border-radius:1.25rem;padding:3rem 2rem;text-align:center;background:#fff;cursor:pointer;transition:border-color 0.2s,background 0.2s;margin-bottom:1.5rem;position:relative;"
+        onclick="document.getElementById('premium-file-input').click()"
+        ondragover="event.preventDefault();this.style.borderColor='var(--teal)';this.style.background='var(--teal-faint)'"
+        ondragleave="this.style.borderColor='rgba(45,112,112,0.3)';this.style.background='#fff'"
+        ondrop="event.preventDefault();this.style.borderColor='rgba(45,112,112,0.3)';this.style.background='#fff';handlePremiumDrop(event)">
+        <input type="file" id="premium-file-input" accept="image/*" style="display:none;" onchange="handlePremiumFile(this.files[0])">
+        <div id="premium-upload-placeholder">
+          <div style="width:56px;height:56px;border-radius:50%;background:var(--teal-faint);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+            <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="var(--teal)" stroke-width="1.75" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <p style="font-size:1rem;font-weight:600;color:var(--deep);margin-bottom:0.375rem;">Drop your photo here</p>
+          <p style="font-size:0.875rem;color:#aaa;">or <span style="color:var(--teal);font-weight:600;">click to browse</span> — JPG, PNG, WEBP</p>
+        </div>
+        <div id="premium-preview-wrap" style="display:none;">
+          <img id="premium-preview-img" src="" alt="Your photo" style="max-height:280px;max-width:100%;border-radius:0.875rem;object-fit:cover;box-shadow:0 8px 32px rgba(30,60,60,0.14);" />
+          <p style="font-size:0.8125rem;color:#aaa;margin-top:0.875rem;">Click to change photo</p>
+        </div>
+      </div>
+
+      <!-- Analyze button -->
+      <div id="premium-action" style="display:none;text-align:center;margin-bottom:2rem;">
+        <button class="btn-premium" id="premium-analyze-btn" onclick="runPremiumAnalysis()" style="font-size:0.875rem;padding:1rem 2.75rem;">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+          Find My Matches
+        </button>
+        <p style="font-size:0.8125rem;color:#ccc;margin-top:0.625rem;">Analysis takes about 3 seconds</p>
+      </div>
+
+      <!-- Analyzing state -->
+      <div id="premium-analyzing" style="display:none;text-align:center;padding:3rem 0;">
+        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--gold));display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;animation:premiumSpin 1.6s linear infinite;">
+          <svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" style="color:#fff;"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+        </div>
+        <p class="font-display" style="font-size:1.125rem;font-weight:700;color:var(--deep);letter-spacing:-0.02em;margin-bottom:0.375rem;" id="premium-analyze-label">Analyzing facial features…</p>
+        <p style="font-size:0.875rem;color:#aaa;">Comparing against <span id="premium-img-count">0</span> surgeon results</p>
+      </div>
+
+      <!-- Results -->
+      <div id="premium-results" style="display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.5rem;">
+          <div>
+            <p class="font-display" style="font-size:1.25rem;font-weight:700;color:var(--deep);letter-spacing:-0.03em;">Your Matches</p>
+            <p style="font-size:0.875rem;color:#888;margin-top:0.125rem;"><span id="premium-match-count">0</span> visually similar results found</p>
+          </div>
+          <button onclick="resetPremiumSearch()" style="display:inline-flex;align-items:center;gap:0.375rem;font-size:0.8125rem;color:var(--teal);background:none;border:none;cursor:pointer;font-weight:600;padding:0;transition:color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--teal)'">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
+            New Search
+          </button>
+        </div>
+        <div id="premium-results-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.5rem;">
+          <!-- cards injected by JS -->
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /screen-premium -->
+
+  <style>
+    @keyframes premiumSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .premium-match-card {
+      background: #fff;
+      border-radius: 1.25rem;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(30,60,60,0.10), 0 2px 8px rgba(30,60,60,0.06);
+      transition: transform 0.22s cubic-bezier(.22,1,.36,1), box-shadow 0.22s;
+    }
+    .premium-match-card:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(30,60,60,0.15), 0 4px 12px rgba(30,60,60,0.08); }
+    .premium-match-images { display: grid; grid-template-columns: 1fr 1fr; position: relative; }
+    .premium-match-img { position: relative; overflow: hidden; aspect-ratio: 4/3; }
+    .premium-match-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .premium-match-img .img-overlay { position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.35) 0%,transparent 60%); }
+    .premium-match-img .img-color-layer { position:absolute;inset:0;background:var(--teal);opacity:0.07;mix-blend-mode:multiply; }
+    .premium-match-img .ba-label { position:absolute;bottom:0.5rem;left:0.5rem;font-size:0.625rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,0.45);padding:0.2rem 0.5rem;border-radius:9999px; }
+    .premium-match-img .ba-label.after { background:rgba(45,112,112,0.7); }
+    .premium-match-divider { position:absolute;top:0;bottom:0;left:50%;width:3px;background:var(--ivory);transform:translateX(-50%);z-index:2; }
+    .premium-match-footer { padding: 0.875rem 1.125rem; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(30,60,60,0.05); }
+    .premium-similarity-badge { display:inline-flex;align-items:center;gap:0.3rem;background:linear-gradient(135deg,#b8912a,var(--gold));color:#fff;font-size:0.6875rem;font-weight:700;letter-spacing:0.1em;padding:0.25rem 0.625rem;border-radius:9999px; }
+  </style>
+
+
+  <!-- ==================== SCREEN: SURGEON LOGIN ==================== -->
+  <div id="screen-surgeon-login" class="screen">
+    <div class="login-card">
+      <!-- Logo -->
+      <div style="text-align:center;margin-bottom:2rem;">
+        <div style="display:inline-flex;align-items:center;gap:0.625rem;margin-bottom:0.625rem;">
+          <svg width="28" height="25" viewBox="0 0 36 32" fill="none" aria-hidden="true">
+            <path d="M18 4L3 4L11 20L18 28L25 20L33 4Z" fill="#2D7070"/>
+            <path d="M18 4L25 4L33 4L26 14L18 28Z" fill="#1F5555" opacity="0.55"/>
+            <path d="M16 4L18 4L18 10L14 4Z" fill="#C4A855"/>
+          </svg>
+          <span class="font-display" style="font-size:1.375rem;font-weight:700;color:var(--teal-dark);letter-spacing:-0.02em;">VUE</span>
+        </div>
+        <p style="font-size:0.6875rem;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);">Surgeon Portal</p>
+      </div>
+
+      <h2 class="font-display" style="font-size:1.5rem;font-weight:700;color:var(--deep);letter-spacing:-0.03em;margin-bottom:0.375rem;">Welcome back</h2>
+      <p style="font-size:0.875rem;color:#888;margin-bottom:1.75rem;line-height:1.6;">Sign in to manage your image library and view patient leads.</p>
+
+      <form onsubmit="surgeonLogin(event)">
+        <div class="form-group">
+          <label class="form-label" for="surgeon-email">Email</label>
+          <input class="form-input" type="email" id="surgeon-email" placeholder="you@practice.com" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="surgeon-password">Password</label>
+          <input class="form-input" type="password" id="surgeon-password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        <div id="login-error" style="display:none;background:rgba(200,50,50,0.08);color:#c83232;font-size:0.8125rem;padding:0.625rem 0.875rem;border-radius:0.625rem;margin-bottom:1rem;"></div>
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:0.9375rem;font-size:0.875rem;margin-bottom:1rem;">Sign In</button>
+      </form>
+    </div>
+  </div><!-- /screen-surgeon-login -->
+
+
+  <!-- ==================== SCREEN: SURGEON DASHBOARD ==================== -->
+  <div id="screen-surgeon-dashboard" class="screen">
+
+    <!-- Dashboard header -->
+    <div class="dash-header">
+      <div style="display:flex;align-items:center;gap:0.875rem;">
+        <svg width="24" height="21" viewBox="0 0 36 32" fill="none" aria-hidden="true">
+          <path d="M18 4L3 4L11 20L18 28L25 20L33 4Z" fill="#2D7070"/>
+          <path d="M18 4L25 4L33 4L26 14L18 28Z" fill="#1F5555" opacity="0.55"/>
+          <path d="M16 4L18 4L18 10L14 4Z" fill="#C4A855"/>
+        </svg>
+        <div>
+          <p id="dash-name" class="dash-surgeon-name">Dr. —</p>
+          <p class="dash-role">Surgeon Portal</p>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:1.25rem;">
+        <button onclick="showScreen('intro')" style="font-size:0.8125rem;color:var(--teal);background:none;border:none;cursor:pointer;font-weight:600;" >← Patient View</button>
+        <button class="dash-logout" onclick="surgeonLogout()">Log Out</button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="dash-tabs">
+      <button class="dash-tab active" id="tab-library" onclick="switchDashTab('library')">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        Image Library
+      </button>
+      <button class="dash-tab" id="tab-leads" onclick="switchDashTab('leads')">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 01-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 011-.96 15 15 0 0014 0A1 1 0 0120 6z"/></svg>
+        Client Leads
+        <span class="tab-badge" id="leads-badge">0</span>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="dash-body">
+
+      <!-- Library panel -->
+      <div id="panel-library">
+        <p class="dash-section-title">Your Image Library</p>
+        <p class="dash-section-sub">Images you deposit appear in the VUE starring queue for patients to discover.</p>
+
+        <!-- Deposit form (collapsible) -->
+        <div class="deposit-form-wrap">
+          <div class="deposit-form-header" onclick="toggleDepositForm()" id="deposit-header">
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <div style="width:32px;height:32px;background:rgba(196,168,85,0.12);border-radius:0.5rem;display:flex;align-items:center;justify-content:center;">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--gold)" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+              </div>
+              <span style="font-size:0.9375rem;font-weight:600;color:var(--deep);">Deposit New Before &amp; After</span>
+            </div>
+            <svg id="deposit-chevron" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#aaa" stroke-width="2" style="transition:transform 0.25s;" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <div id="deposit-form-body" class="deposit-form-body" style="display:none;">
+            <form onsubmit="submitDeposit(event)" style="margin-top:1.25rem;">
+              <div class="deposit-grid">
+                <div class="form-group">
+                  <label class="form-label" for="dep-procedure">Procedure Name</label>
+                  <input class="form-input" type="text" id="dep-procedure" placeholder="e.g. Rhinoplasty" required list="procedure-suggestions" />
+                  <datalist id="procedure-suggestions"></datalist>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="dep-category">Category</label>
+                  <select class="form-input" id="dep-category" required style="appearance:auto;">
+                    <option value="">Select category…</option>
+                    <option value="Facial">Face &amp; Neck</option>
+                    <option value="Body">Body</option>
+                    <option value="Breast">Breast</option>
+                    <option value="Non-Surgical">Non-Surgical</option>
+                    <option value="Skin">Skin</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="dep-before">Before Image URL</label>
+                  <input class="form-input" type="url" id="dep-before" placeholder="https://…" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="dep-after">After Image URL</label>
+                  <input class="form-input" type="url" id="dep-after" placeholder="https://…" required />
+                </div>
+              </div>
+              <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:0.5rem;">
+                <button type="submit" class="btn-primary" style="font-size:0.8125rem;padding:0.75rem 1.5rem;">
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                  Add to Library
+                </button>
+                <button type="button" onclick="toggleDepositForm()" class="btn-ghost" style="font-size:0.8125rem;padding:0.75rem 1.25rem;">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Library grid -->
+        <div id="library-grid" class="library-grid"></div>
+        <p id="library-empty" style="display:none;text-align:center;color:#bbb;padding:3rem 0;font-size:0.9375rem;">No images deposited yet.</p>
+      </div>
+
+      <!-- Leads panel -->
+      <div id="panel-leads" style="display:none;">
+        <p class="dash-section-title">Client Leads</p>
+        <p class="dash-section-sub">Patients who starred your procedures and ranked you in their top 3.</p>
+        <div class="lead-stats" id="lead-stats"></div>
+        <div id="leads-list"></div>
+        <p id="leads-empty" style="display:none;text-align:center;color:#bbb;padding:3rem 0;font-size:0.9375rem;">No leads yet — keep growing your image library!</p>
+      </div>
+
+    </div>
+  </div><!-- /screen-surgeon-dashboard -->
+
+
+  <!-- ==================== JS ==================== -->
+  <script>
+    // ── DATA — loaded from surgeon-images.json (the image deposit) ────
+    // SURGEONS and PAIRS are populated by loadImageLibrary() on boot.
+    // Surgeons add images by submitting entries to surgeon-images.json
+    // (or via a POST API in production — same shape as the JSON schema).
+    let SURGEONS = [];
+    let PAIRS    = [];
+
+    // ── PROCEDURE GROUPS ──────────────────────────────────────────────
+    const PROCEDURE_GROUPS = [
+      { label: 'Face & Neck', category: 'Facial',      procedures: ['Rhinoplasty','Revision Rhinoplasty','Tip Refinement','Septoplasty','Blepharoplasty','Brow Lift','Facelift','Neck Lift','Mid-Face Lift','Lip Lift','Chin Augmentation','Chin Implant','Cheek Augmentation','Jaw Recontouring','Jaw Implant','Forehead Reduction','Ear Reshaping','Scar Revision'] },
+      { label: 'Body',        category: 'Body',        procedures: ['Liposuction','Tummy Tuck','Body Contouring','Arm Lift','Brazilian Butt Lift','Fat Transfer'] },
+      { label: 'Breast',      category: 'Breast',      procedures: ['Breast Augmentation','Breast Lift','Breast Reduction','Implant Revision'] },
+      { label: 'Non-Surgical',category: 'Non-Surgical',procedures: ['Botox','Filler Treatment','Thread Lift','Skin Resurfacing'] },
+    ];
+
+    // ── STATE ──────────────────────────────────────────────────────────
+    let selectedProcedure = 'all'; // 'all' | category name | specific procedure name
+    let starredPairs  = []; // { pairId, surgeonId }
+    let seenPairIds   = new Set();
+    let queue         = [];
+    let currentIdx    = 0;
+    let lastMilestone = 0;
+
+    // Distance filter state
+    let distanceFilterEnabled = false;
+    let selectedDistanceMiles = 25;
+    let userLat = null;
+    let userLng = null;
+    let locationStatus = 'idle'; // 'idle' | 'getting' | 'granted' | 'denied'
+    let isAnimating   = false;
+    const MILESTONE   = 25;
+
+    // ── INIT ──────────────────────────────────────────────────────────
+    function getFilteredPairs() {
+      let pairs;
+      if (selectedProcedure === 'all') pairs = [...PAIRS];
+      else {
+        const isCategory = PROCEDURE_GROUPS.some(g => g.category === selectedProcedure);
+        pairs = isCategory
+          ? PAIRS.filter(p => p.category === selectedProcedure)
+          : PAIRS.filter(p => p.procedure === selectedProcedure);
+      }
+      // Apply distance filter if active and location is known
+      if (distanceFilterEnabled && locationStatus === 'granted') {
+        pairs = pairs.filter(p => {
+          const surgeon = SURGEONS.find(s => s.id === p.surgeonId);
+          return surgeon ? isSurgeonInRange(surgeon) : true;
+        });
+      }
+      return pairs;
+    }
+
+    function initQueue() {
+      queue = spreadShuffle(getFilteredPairs());
+      currentIdx = 0;
+    }
+
+    // Fisher-Yates — used internally to randomise within each surgeon's bucket
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // Spread-shuffle: interleaves surgeon buckets so the same surgeon
+    // never appears twice in a row. Buckets are weighted by size so
+    // surgeons with more images still appear proportionally more often.
+    function spreadShuffle(arr) {
+      // Group by surgeonId and shuffle within each group
+      const map = {};
+      arr.forEach(p => {
+        if (!map[p.surgeonId]) map[p.surgeonId] = [];
+        map[p.surgeonId].push(p);
+      });
+      const buckets = Object.values(map).map(b => shuffle(b));
+
+      const result = [];
+      let lastId = null;
+
+      while (buckets.some(b => b.length > 0)) {
+        // Prefer buckets that aren't the last surgeon shown
+        const eligible = buckets.filter(b => b.length > 0 && b[0].surgeonId !== lastId);
+        const pool     = eligible.length > 0 ? eligible : buckets.filter(b => b.length > 0);
+
+        // Weighted-random pick: surgeons with more remaining images are chosen more often
+        const total = pool.reduce((s, b) => s + b.length, 0);
+        let   rand  = Math.random() * total;
+        let   chosen = pool[pool.length - 1];
+        for (const b of pool) {
+          rand -= b.length;
+          if (rand <= 0) { chosen = b; break; }
+        }
+
+        result.push(chosen.shift());
+        lastId = result[result.length - 1].surgeonId;
+      }
+
+      return result;
+    }
+
+    initQueue();
+
+    // ── SCREENS ────────────────────────────────────────────────────────
+    function showScreen(name) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-' + name).classList.add('active');
+
+      const navCta    = document.getElementById('nav-cta');
+      const navCount  = document.getElementById('nav-star-count');
+      const navCountN = document.getElementById('nav-count-num');
+
+      if (name === 'intro') {
+        navCta.textContent = 'Start Exploring';
+        navCta.onclick = () => showScreen('procedure');
+        navCount.style.display = 'none';
+      } else if (name === 'procedure') {
+        navCta.textContent = 'Start Starring';
+        navCta.onclick = startStarring;
+        navCount.style.display = starredPairs.length > 0 ? 'flex' : 'none';
+        if (navCountN) navCountN.textContent = starredPairs.length;
+        renderProcedureScreen();
+      } else if (name === 'app') {
+        navCta.textContent = starredPairs.length >= MILESTONE ? 'See My Surgeons' : 'Keep Starring';
+        if (starredPairs.length >= MILESTONE) navCta.onclick = () => showScreen('results');
+        navCount.style.display = 'flex';
+        navCountN.textContent = starredPairs.length;
+        // Update procedure label in app header
+        const procLabel = selectedProcedure === 'all' ? 'All Procedures'
+          : PROCEDURE_GROUPS.find(g => g.category === selectedProcedure)?.label || selectedProcedure;
+        const titleEl = document.getElementById('app-procedure-title');
+        const subEl   = document.getElementById('app-procedure-sub');
+        if (titleEl) titleEl.textContent = selectedProcedure === 'all' ? 'Browse Results' : procLabel;
+        if (subEl)   subEl.textContent   = selectedProcedure === 'all' ? 'All Procedures' : procLabel;
+        renderCard();
+        updateProgress();
+      } else if (name === 'results') {
+        navCta.textContent = 'Keep Starring';
+        navCta.onclick = () => showScreen('app');
+        navCount.style.display = 'flex';
+        navCountN.textContent = starredPairs.length;
+        renderResults();
+      } else if (name === 'premium') {
+        if (!loggedInMember) { openMemberModal(); return; }
+        navCta.textContent = 'Start Starring';
+        navCta.onclick = () => showScreen('procedure');
+        navCount.style.display = 'none';
+      }
+    }
+
+    // ── CARD RENDERING ─────────────────────────────────────────────────
+    function currentPair() {
+      if (currentIdx >= queue.length) return null;
+      return queue[currentIdx];
+    }
+
+    function renderCard() {
+      const wrap = document.getElementById('card-wrap');
+      const pair = currentPair();
+
+      if (!pair) {
+        // Refill queue (excluding already seen this loop)
+        initQueue();
+        renderCard();
+        return;
+      }
+
+      wrap.innerHTML = `
+        <div class="ba-card entering" id="active-card">
+          <div class="ba-images" style="position:relative;">
+            <div class="ba-img-side">
+              <img src="${pair.beforeUrl}" alt="Before: ${pair.procedure}" loading="lazy" />
+              <div class="img-overlay"></div>
+              <div class="img-color-layer"></div>
+              <span class="ba-label">Before</span>
+            </div>
+            <div style="position:absolute;top:0;bottom:0;left:50%;width:3px;background:var(--ivory);transform:translateX(-50%);z-index:2;"></div>
+            <div class="ba-img-side">
+              <img src="${pair.afterUrl}" alt="After: ${pair.procedure}" loading="lazy" />
+              <div class="img-overlay"></div>
+              <div class="img-color-layer"></div>
+              <span class="ba-label after">After</span>
+            </div>
+          </div>
+          <div class="ba-footer">
+            <div class="ba-procedure">
+              <p class="ba-procedure-type">${pair.category}</p>
+              <p class="ba-procedure-name">${pair.procedure}</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.5rem;opacity:0.35;">
+              <svg width="14" height="14" fill="var(--teal)" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              <span style="font-size:0.8125rem;color:#999;">Board-Certified</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ── ACTIONS ────────────────────────────────────────────────────────
+    function handleStar() {
+      if (isAnimating) return;
+      const pair = currentPair();
+      if (!pair) return;
+      isAnimating = true;
+
+      // Star burst effect
+      const btn = document.getElementById('star-btn');
+      const rect = btn.getBoundingClientRect();
+      const burst = document.createElement('div');
+      burst.className = 'star-burst';
+      burst.style.left = (rect.left + rect.width / 2 - 40) + 'px';
+      burst.style.top  = (rect.top + rect.height / 2 - 40) + 'px';
+      document.body.appendChild(burst);
+      setTimeout(() => burst.remove(), 500);
+
+      // Record star
+      starredPairs.push({ pairId: pair.id, surgeonId: pair.surgeonId });
+      seenPairIds.add(pair.id);
+      currentIdx++;
+
+      updateProgress();
+      updateNavCount();
+      checkMilestone();
+
+      // Animate card out
+      const card = document.getElementById('active-card');
+      if (card) card.classList.add('leaving-star');
+
+      setTimeout(() => {
+        isAnimating = false;
+        renderCard();
+      }, 350);
+    }
+
+    function handleSkip() {
+      if (isAnimating) return;
+      const pair = currentPair();
+      if (!pair) return;
+      isAnimating = true;
+
+      seenPairIds.add(pair.id);
+      currentIdx++;
+
+      const card = document.getElementById('active-card');
+      if (card) card.classList.add('leaving-skip');
+
+      setTimeout(() => {
+        isAnimating = false;
+        renderCard();
+      }, 350);
+    }
+
+    // ── PROGRESS ───────────────────────────────────────────────────────
+    function updateProgress() {
+      const count      = starredPairs.length;
+      // Progress within current 25-block (resets each milestone)
+      const blockPos   = count % MILESTONE;
+      const pct        = count < MILESTONE
+        ? Math.round((count / MILESTONE) * 100)
+        : blockPos === 0 ? 100 : Math.round((blockPos / MILESTONE) * 100);
+      const nextTarget = Math.ceil((count + 1) / MILESTONE) * MILESTONE;
+      const toNext     = nextTarget - count;
+
+      document.getElementById('count-display').textContent = count;
+
+      const fill  = document.getElementById('progress-fill');
+      const label = document.getElementById('progress-label');
+      const pctEl = document.getElementById('progress-pct');
+
+      fill.style.width = pct + '%';
+      pctEl.textContent = pct + '%';
+
+      if (count >= MILESTONE) {
+        // At an exact milestone boundary
+        if (blockPos === 0) {
+          label.textContent = count + ' starred — matches updated!';
+        } else {
+          label.textContent = toNext + ' more to next update  ·  ' + count + ' total';
+        }
+        label.style.color = 'var(--teal)';
+        label.style.fontWeight = '600';
+        pctEl.style.color = 'var(--gold)';
+        // Nav CTA
+        const navCta = document.getElementById('nav-cta');
+        navCta.textContent = 'See My Surgeons';
+        navCta.onclick = () => showScreen('results');
+      } else {
+        label.textContent = count + ' of ' + MILESTONE + ' to unlock matches';
+        label.style.color = '';
+        label.style.fontWeight = '';
+        pctEl.style.color = 'var(--teal)';
+      }
+
+      // Update / show matches bar
+      const bar = document.getElementById('matches-bar');
+      if (count >= MILESTONE) {
+        if (bar.style.display === 'none') bar.style.display = 'flex';
+        document.getElementById('bar-count').textContent = count;
+      }
+    }
+
+    function updateNavCount() {
+      const n = document.getElementById('nav-count-num');
+      if (n) n.textContent = starredPairs.length;
+    }
+
+    // ── MILESTONE ──────────────────────────────────────────────────────
+    function checkMilestone() {
+      const count     = starredPairs.length;
+      const milestone = Math.floor(count / MILESTONE) * MILESTONE;
+      if (count > 0 && count % MILESTONE === 0 && milestone !== lastMilestone) {
+        lastMilestone = milestone;
+        showMilestoneToast(count);
+      }
+    }
+
+    function showMilestoneToast(count) {
+      // Dismiss any existing toast first
+      dismissToast();
+
+      const isFirst   = count === MILESTONE;
+      const round     = count / MILESTONE;
+      const headlines = {
+        1: 'First Matches Unlocked!',
+        2: 'Getting Sharper!',
+        3: 'Highly Refined!',
+      };
+      const title   = headlines[round] || `${count} Stars — Excellent Data!`;
+      const subtext = isFirst
+        ? 'Your first matches are ready. Keep going for even better results.'
+        : `${count} stars in — your matches are more accurate now. Keep starring or see your top surgeons.`;
+
+      const toast = document.createElement('div');
+      toast.className = 'milestone-toast';
+      toast.innerHTML = `
+        <div style="display:flex;align-items:flex-start;gap:1rem;margin-bottom:1rem;">
+          <div style="width:40px;height:40px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:#fff;">${round}</div>
+          <div>
+            <p class="font-display" style="font-size:1.0625rem;font-weight:700;color:#fff;margin-bottom:0.25rem;">${title}</p>
+            <p style="font-size:0.875rem;color:rgba(255,255,255,0.65);line-height:1.5;">${subtext}</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+          <button onclick="showScreen('results')" style="flex:1;min-width:120px;padding:0.625rem 1.25rem;background:var(--gold);color:#fff;border:none;border-radius:9999px;font-size:0.8125rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;">
+            See My Surgeons →
+          </button>
+          <button onclick="dismissToast()" style="flex:1;min-width:120px;padding:0.625rem 1.25rem;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.15);border-radius:9999px;font-size:0.8125rem;font-weight:600;cursor:pointer;">
+            Keep Starring
+          </button>
+        </div>
+      `;
+      toast.id = 'milestone-toast';
+      document.body.appendChild(toast);
+    }
+
+    function dismissToast() {
+      const t = document.getElementById('milestone-toast');
+      if (t) {
+        t.classList.add('hiding');
+        setTimeout(() => t.remove(), 350);
+      }
+    }
+
+    // ── RESULTS ────────────────────────────────────────────────────────
+    function renderResults() {
+      dismissToast();
+
+      // Tally
+      const counts = {};
+      starredPairs.forEach(p => {
+        counts[p.surgeonId] = (counts[p.surgeonId] || 0) + 1;
+      });
+
+      // Sort all starred surgeons, take top 3
+      const ranked = Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([id, stars]) => ({ surgeon: SURGEONS.find(s => s.id === +id), stars }))
+        .filter(({ surgeon }) => surgeon != null); // guard against unmatched ids
+
+      // Update total
+      document.getElementById('results-total-stars').textContent = starredPairs.length;
+
+      const list = document.getElementById('results-list');
+
+      if (ranked.length === 0) {
+        list.innerHTML = `<div class="empty-state"><p class="font-display" style="font-size:1.25rem;color:#aaa;">No starred results yet.</p></div>`;
+        return;
+      }
+
+      // Warn if results are limited due to a narrow procedure selection
+      const procLabel = selectedProcedure === 'all' ? null
+        : PROCEDURE_GROUPS.find(g => g.category === selectedProcedure)?.label || selectedProcedure;
+      const narrowBanner = ranked.length === 1
+        ? `<div style="background:rgba(196,168,85,0.1);border:1px solid rgba(196,168,85,0.25);border-radius:0.875rem;padding:0.875rem 1.125rem;margin-bottom:1.5rem;display:flex;align-items:flex-start;gap:0.75rem;">
+            <span style="font-size:1rem;flex-shrink:0;">💡</span>
+            <p style="font-size:0.8125rem;line-height:1.6;color:#666;">
+              Only one surgeon has uploaded <strong>${procLabel || 'this procedure'}</strong> images so far.
+              <button onclick="showScreen('procedure')" style="color:var(--teal);font-weight:600;background:none;border:none;cursor:pointer;padding:0;font-size:inherit;">Try a broader category</button> to compare more surgeons.
+            </p>
+           </div>`
+        : '';
+      list.innerHTML = narrowBanner;
+
+      const rankLabels  = { 1:'#1', 2:'#2', 3:'#3' };
+      const rankClasses = { 1:'rank-1', 2:'rank-2', 3:'rank-3' };
+
+      list.innerHTML += ranked.map(({ surgeon, stars }, i) => {
+        const rank = i + 1;
+        return `
+          <div class="surgeon-result">
+            <div class="result-inner">
+              <div class="result-rank ${rankClasses[rank]}">${rankLabels[rank]}</div>
+              <div class="result-photo">
+                <img src="${surgeon.photo}" alt="${surgeon.name}" />
+              </div>
+              <div class="result-info">
+                <p class="result-name">${surgeon.name}</p>
+                <p class="result-meta">${surgeon.specialty} &nbsp;·&nbsp; ${surgeon.location}</p>
+                <p class="result-meta" style="margin-top:0.15rem;">${surgeon.years} yrs experience &nbsp;·&nbsp; <span style="color:var(--gold);">★</span> ${surgeon.rating}</p>
+              </div>
+              <div class="result-stars">
+                <p class="result-star-count">${stars}</p>
+                <p class="result-star-label">${stars === 1 ? 'star' : 'stars'}</p>
+              </div>
+            </div>
+            <div class="result-action">
+              <button class="btn-primary" style="width:100%;padding:0.75rem 1rem;font-size:0.75rem;" onclick="alert('Profile coming soon — ' + '${surgeon.name}')">
+                View Full Profile
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (ranked.length < 5) {
+        list.innerHTML += `<p class="no-more">Star more results to fill all 3 spots</p>`;
+      }
+    }
+
+    // ── PROCEDURE PICKER ──────────────────────────────────────────────
+    // Returns the number of distinct surgeons for a given filter value
+    function surgeonCountFor(value) {
+      let pool;
+      if (value === 'all') pool = PAIRS;
+      else if (PROCEDURE_GROUPS.some(g => g.category === value)) pool = PAIRS.filter(p => p.category === value);
+      else pool = PAIRS.filter(p => p.procedure === value);
+      // Filter by distance if active and location known
+      if (distanceFilterEnabled && locationStatus === 'granted') {
+        pool = pool.filter(p => {
+          const surgeon = SURGEONS.find(s => s.id === p.surgeonId);
+          return surgeon ? isSurgeonInRange(surgeon) : true;
+        });
+      }
+      return new Set(pool.map(p => p.surgeonId)).size;
+    }
+
+    function renderProcedureScreen() {
+      const container = document.getElementById('proc-groups');
+      container.innerHTML = PROCEDURE_GROUPS.map(group => {
+        const catValue    = group.category;
+        const catActive   = selectedProcedure === catValue;
+        const catSurgeons = surgeonCountFor(catValue);
+        return `
+          <div class="proc-group">
+            <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.875rem;">
+              <span class="proc-group-label ${catActive ? 'active' : ''}">${group.label}</span>
+              <div class="proc-group-line"></div>
+              <button class="proc-group-all-chip ${catActive ? 'selected' : ''}"
+                onclick="selectProcedure('${catValue}')"
+                aria-pressed="${catActive}">
+                All ${group.label} &nbsp;·&nbsp; ${catSurgeons} surgeon${catSurgeons !== 1 ? 's' : ''}
+              </button>
+            </div>
+            <div class="proc-chips">
+              ${group.procedures.map(proc => {
+                const imgCount = PAIRS.filter(p => p.procedure === proc).length;
+                if (imgCount === 0) return '';
+                const docCount   = surgeonCountFor(proc);
+                const isSelected = selectedProcedure === proc;
+                const singleWarn = docCount === 1 && !isSelected;
+                return `<button class="proc-chip ${isSelected ? 'selected' : ''}"
+                  onclick="selectProcedure('${proc}')"
+                  aria-pressed="${isSelected}"
+                  title="${docCount === 1 ? 'Only 1 surgeon has uploaded this procedure — results will show 1 match' : docCount + ' surgeons · ' + imgCount + ' images'}">
+                  ${proc}
+                  <span style="opacity:${singleWarn ? '0.45' : '0.55'};font-size:0.6875rem;margin-left:0.15rem;">
+                    ${docCount} surgeon${docCount !== 1 ? 's' : ''}${singleWarn ? ' ⚠' : ''}
+                  </span>
+                </button>`;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Sync the "All" button
+      const allBtn = document.getElementById('proc-all-btn');
+      if (allBtn) {
+        allBtn.classList.toggle('selected', selectedProcedure === 'all');
+        allBtn.setAttribute('aria-pressed', selectedProcedure === 'all');
+        // Update sub-text to reflect distance filter
+        const allSub = allBtn.querySelector('.proc-all-sub');
+        if (allSub) {
+          const totalSurgeons = surgeonCountFor('all');
+          if (distanceFilterEnabled && locationStatus === 'granted') {
+            const cap = selectedDistanceMiles >= DIST_UNLIMITED ? 'any distance' : selectedDistanceMiles + ' miles';
+            allSub.textContent = `${totalSurgeons} surgeon${totalSurgeons !== 1 ? 's' : ''} within ${cap}`;
+          } else if (distanceFilterEnabled && locationStatus === 'getting') {
+            allSub.textContent = 'Locating you…';
+          } else {
+            allSub.textContent = 'Browse everything — widest selection, most surgeons';
+          }
+        }
+      }
+    }
+
+    // ── DISTANCE FILTER ────────────────────────────────────────────────
+    function haversineDistanceMiles(lat1, lng1, lat2, lng2) {
+      const R = 3958.8; // Earth radius in miles
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLng = (lng2 - lng1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) ** 2 +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLng/2) ** 2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    const DIST_UNLIMITED = 500; // slider max = treat as "any distance"
+
+    function isSurgeonInRange(surgeon) {
+      if (!distanceFilterEnabled || locationStatus !== 'granted') return true;
+      if (selectedDistanceMiles >= DIST_UNLIMITED) return true; // unlimited — show all
+      if (surgeon.lat == null || surgeon.lng == null) return true;
+      return haversineDistanceMiles(userLat, userLng, surgeon.lat, surgeon.lng) <= selectedDistanceMiles;
+    }
+
+    function distLabelText(miles) {
+      return miles >= DIST_UNLIMITED ? 'Any distance' : miles + ' mi';
+    }
+
+    function updateSliderTrack(slider) {
+      const pct = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+      slider.style.background = `linear-gradient(to right, var(--teal) ${pct}%, var(--ivory-dark) ${pct}%)`;
+    }
+
+    function toggleDistanceFilter(enabled) {
+      distanceFilterEnabled = enabled;
+      const wrap    = document.getElementById('dist-filter-wrap');
+      const options = document.getElementById('dist-options');
+      const sub     = document.getElementById('dist-filter-sub');
+
+      wrap.classList.toggle('active', enabled);
+      options.style.display = enabled ? 'flex' : 'none';
+      options.style.flexDirection = 'column';
+
+      if (enabled) {
+        // Init slider position and track fill
+        const slider = document.getElementById('dist-range-input');
+        if (slider) {
+          slider.value = selectedDistanceMiles;
+          updateSliderTrack(slider);
+          slider.classList.toggle('unlimited', selectedDistanceMiles >= DIST_UNLIMITED);
+        }
+        const valEl = document.getElementById('dist-slider-value');
+        if (valEl) {
+          valEl.textContent = distLabelText(selectedDistanceMiles);
+          valEl.classList.toggle('unlimited', selectedDistanceMiles >= DIST_UNLIMITED);
+        }
+        if (locationStatus === 'idle') {
+          requestUserLocation();
+        } else {
+          updateDistStatusUI();
+        }
+        sub.textContent = selectedDistanceMiles >= DIST_UNLIMITED
+          ? 'Any distance — showing all surgeons'
+          : selectedDistanceMiles + ' miles from your location';
+      } else {
+        sub.textContent = 'Filter surgeons by distance';
+      }
+      renderProcedureScreen();
+    }
+
+    function onDistanceSlider(rawValue) {
+      const miles = +rawValue;
+      selectedDistanceMiles = miles;
+
+      const slider = document.getElementById('dist-range-input');
+      const valEl  = document.getElementById('dist-slider-value');
+      const sub    = document.getElementById('dist-filter-sub');
+      const isUnlimited = miles >= DIST_UNLIMITED;
+
+      if (slider) {
+        updateSliderTrack(slider);
+        slider.classList.toggle('unlimited', isUnlimited);
+      }
+      if (valEl) {
+        valEl.textContent = distLabelText(miles);
+        valEl.classList.toggle('unlimited', isUnlimited);
+      }
+      if (sub) {
+        sub.textContent = isUnlimited
+          ? 'Any distance — showing all surgeons'
+          : miles + ' miles from your location';
+      }
+      renderProcedureScreen();
+    }
+
+    function requestUserLocation() {
+      locationStatus = 'getting';
+      updateDistStatusUI();
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          userLat = pos.coords.latitude;
+          userLng = pos.coords.longitude;
+          locationStatus = 'granted';
+          updateDistStatusUI();
+          renderProcedureScreen();
+        },
+        () => {
+          locationStatus = 'denied';
+          updateDistStatusUI();
+          renderProcedureScreen();
+        },
+        { timeout: 10000 }
+      );
+    }
+
+    function updateDistStatusUI() {
+      const statusWrap = document.getElementById('dist-location-status');
+      const dot        = document.getElementById('dist-status-dot');
+      const text       = document.getElementById('dist-status-text');
+      if (!statusWrap) return;
+
+      statusWrap.style.display = 'flex';
+      dot.className = 'dist-status-dot';
+
+      if (locationStatus === 'getting') {
+        dot.classList.add('getting');
+        text.textContent = 'Getting your location…';
+        text.style.color = '#a07830';
+      } else if (locationStatus === 'granted') {
+        dot.classList.add('granted');
+        text.textContent = 'Using your current location';
+        text.style.color = '#2a8a50';
+      } else if (locationStatus === 'denied') {
+        dot.classList.add('denied');
+        text.textContent = 'Location unavailable — showing all surgeons';
+        text.style.color = '#c84040';
+      } else {
+        statusWrap.style.display = 'none';
+      }
+    }
+
+    function selectProcedure(value) {
+      selectedProcedure = value;
+      // Update display label
+      const label = value === 'all' ? 'All Procedures'
+        : (PROCEDURE_GROUPS.find(g => g.category === value)?.label || value);
+      const dispEl = document.getElementById('proc-selected-display');
+      if (dispEl) dispEl.textContent = label;
+      // Re-render chips
+      renderProcedureScreen();
+    }
+
+    function procBack() {
+      if (starredPairs.length > 0) showScreen('app');
+      else showScreen('intro');
+    }
+
+    function startStarring() {
+      // Reset session for new procedure
+      starredPairs  = [];
+      seenPairIds   = new Set();
+      lastMilestone = 0;
+      initQueue();
+      const bar = document.getElementById('matches-bar');
+      if (bar) bar.style.display = 'none';
+      showScreen('app');
+    }
+
+    // ── RESET ──────────────────────────────────────────────────────────
+    function resetApp() {
+      selectedProcedure = 'all';
+      starredPairs  = [];
+      seenPairIds   = new Set();
+      lastMilestone = 0;
+      initQueue();
+
+      const bar = document.getElementById('matches-bar');
+      if (bar) bar.style.display = 'none';
+
+      showScreen('intro');
+    }
+
+    // ── KEYBOARD ──────────────────────────────────────────────────────
+    document.addEventListener('keydown', e => {
+      const appActive = document.getElementById('screen-app').classList.contains('active');
+      if (!appActive) return;
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); handleStar(); }
+      if (e.key === 'ArrowLeft')                   { e.preventDefault(); handleSkip(); }
+    });
+
+    // ── IMAGE LIBRARY LOADER ──────────────────────────────────────────
+    // Fetches surgeon-images.json (the image deposit).
+    // In production, swap this URL for your API endpoint — same JSON shape.
+    async function loadImageLibrary() {
+      const loadEl = document.getElementById('loading-overlay');
+      try {
+        const res  = await fetch('./surgeon-images.json');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        SURGEONS = data.surgeons;
+        // Normalise image objects to match internal PAIRS shape
+        PAIRS = data.images.map(img => ({
+          id:        img.id,
+          surgeonId: img.surgeonId,
+          procedure: img.procedure,
+          category:  img.category,
+          beforeUrl: img.beforeUrl,
+          afterUrl:  img.afterUrl,
+        }));
+      } catch (err) {
+        console.warn('Image library unavailable — serve via `node serve.mjs`', err);
+        // Show a helpful notice inside the loading overlay
+        if (loadEl) {
+          loadEl.innerHTML = `
+            <div style="text-align:center;padding:2rem;">
+              <p style="font-family:'Playfair Display',serif;font-size:1.25rem;color:#1A3A3A;margin-bottom:0.5rem;">Library unavailable</p>
+              <p style="font-size:0.875rem;color:#888;line-height:1.6;">Open a terminal in the project folder and run<br><code style="background:#EDE6DA;padding:0.2rem 0.5rem;border-radius:4px;font-size:0.8125rem;">node serve.mjs</code><br>then visit <strong>http://localhost:3000</strong></p>
+            </div>`;
+          return;
+        }
+      }
+      if (loadEl) {
+        loadEl.style.opacity = '0';
+        setTimeout(() => loadEl.remove(), 300);
+      }
+      showScreen('intro');
+    }
+
+    // ── SURGEON PORTAL ────────────────────────────────────────────────
+
+    let loggedInSurgeon = null;
+    let dashTab = 'library';
+    let depositFormOpen = false;
+
+    // Mock leads per surgeon — in production these come from the server
+    // whenever a patient's top-3 result includes this surgeon.
+    const SURGEON_LEADS = {
+      1: [
+        { id:1,  email:'sarah.m@email.com',    procedure:'Rhinoplasty',        rank:1, stars:9,  date:'2026-03-14' },
+        { id:2,  email:'jessica.k@email.com',  procedure:'Blepharoplasty',     rank:2, stars:6,  date:'2026-03-13' },
+        { id:3,  email:'maya.r@email.com',     procedure:'Lip Lift',           rank:1, stars:11, date:'2026-03-12' },
+        { id:4,  email:'priya.t@email.com',    procedure:'Rhinoplasty',        rank:3, stars:4,  date:'2026-03-11' },
+      ],
+      2: [
+        { id:5,  email:'daniel.h@email.com',   procedure:'Liposuction',        rank:1, stars:7,  date:'2026-03-13' },
+        { id:6,  email:'claire.w@email.com',   procedure:'Tummy Tuck',         rank:2, stars:5,  date:'2026-03-12' },
+      ],
+      3: [
+        { id:7,  email:'nina.s@email.com',     procedure:'Breast Augmentation',rank:1, stars:10, date:'2026-03-14' },
+        { id:8,  email:'leila.k@email.com',    procedure:'Breast Lift',        rank:1, stars:8,  date:'2026-03-12' },
+        { id:9,  email:'amanda.r@email.com',   procedure:'Breast Reduction',   rank:3, stars:4,  date:'2026-03-10' },
+      ],
+      4: [
+        { id:10, email:'tom.g@email.com',      procedure:'Rhinoplasty',        rank:2, stars:7,  date:'2026-03-13' },
+      ],
+      5: [
+        { id:11, email:'grace.m@email.com',    procedure:'Facelift',           rank:1, stars:8,  date:'2026-03-14' },
+        { id:12, email:'helen.p@email.com',    procedure:'Neck Lift',          rank:2, stars:5,  date:'2026-03-11' },
+      ],
+      6: [],
+      7: [
+        { id:13, email:'zoe.b@email.com',      procedure:'Botox',              rank:1, stars:9,  date:'2026-03-13' },
+        { id:14, email:'rachel.t@email.com',   procedure:'Filler Treatment',   rank:2, stars:6,  date:'2026-03-12' },
+        { id:15, email:'anna.c@email.com',     procedure:'Thread Lift',        rank:3, stars:3,  date:'2026-03-10' },
+      ],
+      8: [
+        { id:16, email:'oliver.n@email.com',   procedure:'Rhinoplasty',        rank:1, stars:8,  date:'2026-03-14' },
+      ],
+    };
+
+    // localStorage helpers for deposited images
+    function getDepositedImages() {
+      try { return JSON.parse(localStorage.getItem('vue_deposited_images') || '[]'); }
+      catch { return []; }
+    }
+    function saveDepositedImages(arr) {
+      try { localStorage.setItem('vue_deposited_images', JSON.stringify(arr)); } catch {}
+    }
+
+    // Populate demo login buttons
+    function renderDemoBtns() {
+      const wrap = document.getElementById('demo-btns');
+      if (!wrap || !SURGEONS.length) return;
+      wrap.innerHTML = SURGEONS.slice(0, 4).map(s => `
+        <button onclick="loginAs(${s.id})"
+          style="font-size:0.6875rem;font-weight:600;padding:0.35rem 0.75rem;background:var(--teal-faint);color:var(--teal);border:1px solid rgba(45,112,112,0.2);border-radius:9999px;cursor:pointer;transition:background 0.2s,color 0.2s;"
+          onmouseover="this.style.background='var(--teal)';this.style.color='#fff'"
+          onmouseout="this.style.background='var(--teal-faint)';this.style.color='var(--teal)'">
+          ${s.name.split(' ').slice(-1)[0]}
+        </button>`).join('');
+    }
+
+    function loginAs(surgeonId) {
+      loggedInSurgeon = SURGEONS.find(s => s.id === surgeonId);
+      if (!loggedInSurgeon) return;
+      showScreen('surgeon-dashboard');
+    }
+
+    function surgeonLogin(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('login-error');
+      // Demo: accept any credentials — in production validate via API
+      const email = document.getElementById('surgeon-email').value.trim();
+      // Match surgeon by email domain stub, else default to first surgeon
+      const matched = SURGEONS.find(s => s.name.toLowerCase().includes(email.split('@')[0].split('.')[0]));
+      loggedInSurgeon = matched || SURGEONS[0];
+      errEl.style.display = 'none';
+      showScreen('surgeon-dashboard');
+    }
+
+    function surgeonLogout() {
+      loggedInSurgeon = null;
+      showScreen('surgeon-login');
+    }
+
+    function showScreen_surgeonDashboard() {
+      const s = loggedInSurgeon;
+      document.getElementById('dash-name').textContent = s.name;
+      const leads = SURGEON_LEADS[s.id] || [];
+      document.getElementById('leads-badge').textContent = leads.length;
+      switchDashTab(dashTab);
+    }
+
+    function switchDashTab(tab) {
+      dashTab = tab;
+      document.getElementById('panel-library').style.display = tab === 'library' ? '' : 'none';
+      document.getElementById('panel-leads').style.display   = tab === 'leads'   ? '' : 'none';
+      document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+      const activeTab = document.getElementById('tab-' + tab);
+      if (activeTab) activeTab.classList.add('active');
+      if (tab === 'library') renderLibrary();
+      if (tab === 'leads')   renderLeads();
+    }
+
+    // ── IMAGE LIBRARY ──────────────────────────────────────────────────
+    function renderLibrary() {
+      const s       = loggedInSurgeon;
+      const deposited = getDepositedImages().filter(i => i.surgeonId === s.id);
+      const fromLib   = PAIRS.filter(p => p.surgeonId === s.id);
+
+      // Populate datalist suggestions
+      const dl = document.getElementById('procedure-suggestions');
+      if (dl) dl.innerHTML = [...new Set(PAIRS.map(p => p.procedure))].map(p => `<option value="${p}">`).join('');
+
+      const grid  = document.getElementById('library-grid');
+      const empty = document.getElementById('library-empty');
+      const all   = [...fromLib.map(p => ({...p, _local: false})), ...deposited.map(p => ({...p, _local: true}))];
+
+      if (all.length === 0) {
+        grid.innerHTML = '';
+        empty.style.display = '';
+        return;
+      }
+      empty.style.display = 'none';
+      grid.innerHTML = all.map(p => `
+        <div class="lib-card">
+          <div class="lib-images">
+            <div style="position:relative;border-right:2px solid var(--ivory);">
+              <img class="lib-img" src="${p.beforeUrl}" alt="Before" />
+              <span style="position:absolute;bottom:0.4rem;left:0.5rem;font-size:0.5rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,0.35);padding:0.1rem 0.4rem;border-radius:3px;">Before</span>
+            </div>
+            <div style="position:relative;">
+              <img class="lib-img" src="${p.afterUrl}" alt="After" />
+              <span style="position:absolute;bottom:0.4rem;left:0.5rem;font-size:0.5rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:rgba(45,112,112,0.65);padding:0.1rem 0.4rem;border-radius:3px;">After</span>
+            </div>
+          </div>
+          <div class="lib-footer">
+            <div>
+              <p class="lib-proc">${p.procedure}</p>
+              <p class="lib-cat">${p.category}</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              ${p._local ? `<span class="lib-badge">New</span>` : ''}
+              ${p._local ? `<button class="lib-delete" onclick="deleteDeposit(${p.id})" title="Remove image" aria-label="Delete">
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>` : ''}
+            </div>
+          </div>
+        </div>`).join('');
+    }
+
+    function toggleDepositForm() {
+      depositFormOpen = !depositFormOpen;
+      document.getElementById('deposit-form-body').style.display = depositFormOpen ? '' : 'none';
+      document.getElementById('deposit-chevron').style.transform  = depositFormOpen ? 'rotate(180deg)' : '';
+    }
+
+    function submitDeposit(e) {
+      e.preventDefault();
+      const proc     = document.getElementById('dep-procedure').value.trim();
+      const category = document.getElementById('dep-category').value;
+      const before   = document.getElementById('dep-before').value.trim();
+      const after    = document.getElementById('dep-after').value.trim();
+      const newImg = {
+        id: Date.now(),
+        surgeonId: loggedInSurgeon.id,
+        procedure: proc,
+        category,
+        beforeUrl: before,
+        afterUrl:  after,
+      };
+      // Persist to localStorage
+      const stored = getDepositedImages();
+      stored.push(newImg);
+      saveDepositedImages(stored);
+      // Add live to the starring queue
+      PAIRS.push({ ...newImg });
+      // Reset form
+      e.target.reset();
+      toggleDepositForm();
+      renderLibrary();
+    }
+
+    function deleteDeposit(id) {
+      const stored = getDepositedImages().filter(i => i.id !== id);
+      saveDepositedImages(stored);
+      // Remove from live PAIRS
+      const idx = PAIRS.findIndex(p => p.id === id);
+      if (idx > -1) PAIRS.splice(idx, 1);
+      renderLibrary();
+    }
+
+    // ── CLIENT LEADS ──────────────────────────────────────────────────
+    function renderLeads() {
+      const leads  = SURGEON_LEADS[loggedInSurgeon.id] || [];
+      const listEl = document.getElementById('leads-list');
+      const empty  = document.getElementById('leads-empty');
+      const stats  = document.getElementById('lead-stats');
+
+      // Stats
+      const top1 = leads.filter(l => l.rank === 1).length;
+      const avgStars = leads.length ? Math.round(leads.reduce((a,l) => a + l.stars, 0) / leads.length) : 0;
+      stats.innerHTML = `
+        <div class="lead-stat"><p class="lead-stat-num">${leads.length}</p><p class="lead-stat-label">Total Leads</p></div>
+        <div class="lead-stat"><p class="lead-stat-num">${top1}</p><p class="lead-stat-label">Ranked #1</p></div>
+        <div class="lead-stat"><p class="lead-stat-num">${avgStars}</p><p class="lead-stat-label">Avg Stars</p></div>
+      `;
+
+      if (leads.length === 0) {
+        listEl.innerHTML = '';
+        empty.style.display = '';
+        return;
+      }
+      empty.style.display = 'none';
+
+      const rankColor = { 1:'rank-1', 2:'rank-2', 3:'rank-3' };
+      listEl.innerHTML = leads.map((l, i) => {
+        const masked = l.email.replace(/(.{2}).+(@.+)/, '$1***$2');
+        const rankLabel = l.rank === 1 ? '#1 Match' : l.rank === 2 ? '#2 Match' : '#3 Match';
+        return `
+        <div class="lead-card" style="animation-delay:${i * 0.07}s;">
+          <div class="lead-rank-badge ${rankColor[l.rank]}">#${l.rank}</div>
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--teal-faint);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="var(--teal)" stroke-width="1.8" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="lead-info">
+            <p class="lead-email">${masked}</p>
+            <p class="lead-meta">Interested in <strong style="color:var(--deep);">${l.procedure}</strong> &nbsp;·&nbsp; ${rankLabel} &nbsp;·&nbsp; ${l.stars} ★ &nbsp;·&nbsp; ${l.date}</p>
+          </div>
+          <div class="lead-action">
+            <a href="mailto:${l.email}?subject=Your VUE inquiry — ${l.procedure}&body=Hello,%0A%0AThank you for your interest in ${l.procedure}. I'd love to schedule a consultation to discuss your goals.%0A%0AKind regards,%0A${loggedInSurgeon.name}" class="email-btn" target="_blank">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Email Patient
+            </a>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // Hook showScreen to handle surgeon screens
+    const _origShowScreen = showScreen;
+    showScreen = function(name) {
+      if (name === 'surgeon-login') {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-surgeon-login').classList.add('active');
+        window.scrollTo(0, 0);
+        const navCta = document.getElementById('nav-cta');
+        navCta.textContent = 'Back to VUE';
+        navCta.onclick = () => _origShowScreen('intro');
+        return;
+      }
+      if (name === 'surgeon-dashboard') {
+        if (!loggedInSurgeon) { showScreen('surgeon-login'); return; }
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-surgeon-dashboard').classList.add('active');
+        window.scrollTo(0, 0);
+        showScreen_surgeonDashboard();
+        const navCta = document.getElementById('nav-cta');
+        navCta.textContent = 'Patient View';
+        navCta.onclick = () => _origShowScreen('intro');
+        return;
+      }
+      _origShowScreen(name);
+    };
+
+    // ── BOOT ──────────────────────────────────────────────────────────
+    loadImageLibrary();
+
+
+    // ── MEMBER AUTH ────────────────────────────────────────────────────
+
+    let loggedInMember = null; // { name, email }
+
+    function getMemberAccounts() {
+      try { return JSON.parse(sessionStorage.getItem('vue_members') || '[]'); }
+      catch(e) { return []; }
+    }
+    function saveMemberAccounts(accounts) {
+      sessionStorage.setItem('vue_members', JSON.stringify(accounts));
+    }
+
+    function openPremiumSearch() {
+      if (loggedInMember) {
+        showScreen('premium');
+      } else {
+        openMemberModal();
+      }
+    }
+
+    function openMemberModal() {
+      document.getElementById('member-modal-backdrop').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => document.getElementById('member-signin-email').focus(), 300);
+    }
+
+    function closeMemberModal() {
+      document.getElementById('member-modal-backdrop').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function switchMemberTab(tab) {
+      const isSignin = tab === 'signin';
+      document.getElementById('mtab-signin').classList.toggle('active', isSignin);
+      document.getElementById('mtab-signup').classList.toggle('active', !isSignin);
+      document.getElementById('member-signin-form').style.display = isSignin ? 'block' : 'none';
+      document.getElementById('member-signup-form').style.display = isSignin ? 'none' : 'block';
+      document.getElementById('member-signin-error').style.display = 'none';
+      document.getElementById('member-signup-error').style.display = 'none';
+    }
+
+    function memberSignIn(e) {
+      e.preventDefault();
+      const email    = document.getElementById('member-signin-email').value.trim().toLowerCase();
+      const password = document.getElementById('member-signin-password').value;
+      const errEl    = document.getElementById('member-signin-error');
+      const accounts = getMemberAccounts();
+      const match    = accounts.find(a => a.email === email && a.password === password);
+      if (!match) {
+        errEl.textContent = 'No account found with those credentials. Need an account? Create one above.';
+        errEl.style.display = 'block';
+        return;
+      }
+      loggedInMember = { name: match.name, email: match.email };
+      onMemberLoggedIn();
+    }
+
+    function memberSignUp(e) {
+      e.preventDefault();
+      const name     = document.getElementById('member-signup-name').value.trim();
+      const email    = document.getElementById('member-signup-email').value.trim().toLowerCase();
+      const password = document.getElementById('member-signup-password').value;
+      const errEl    = document.getElementById('member-signup-error');
+      const accounts = getMemberAccounts();
+      if (accounts.find(a => a.email === email)) {
+        errEl.textContent = 'An account with that email already exists. Please sign in.';
+        errEl.style.display = 'block';
+        return;
+      }
+      accounts.push({ name, email, password });
+      saveMemberAccounts(accounts);
+      loggedInMember = { name, email };
+      onMemberLoggedIn();
+    }
+
+    function onMemberLoggedIn() {
+      closeMemberModal();
+      updateMemberNav();
+      showScreen('premium');
+    }
+
+    function memberLogout() {
+      loggedInMember = null;
+      updateMemberNav();
+      showScreen('intro');
+    }
+
+    function updateMemberNav() {
+      let el = document.getElementById('nav-member-info');
+      if (loggedInMember) {
+        if (!el) {
+          el = document.createElement('div');
+          el.id = 'nav-member-info';
+          el.style.cssText = 'display:flex;align-items:center;gap:0.625rem;';
+          el.innerHTML = `
+            <span id="nav-member-name" style="font-size:0.75rem;color:var(--teal);font-weight:600;"></span>
+            <button onclick="memberLogout()" style="font-size:0.75rem;color:#aaa;background:none;border:none;cursor:pointer;padding:0;transition:color 0.2s;" onmouseover="this.style.color='var(--deep)'" onmouseout="this.style.color='#aaa'">Log out</button>`;
+          // Insert before the surgeon portal button
+          const surgeonBtn = document.getElementById('nav-surgeon-btn');
+          surgeonBtn.parentNode.insertBefore(el, surgeonBtn);
+        }
+        document.getElementById('nav-member-name').textContent =
+          '★ ' + (loggedInMember.name.split(' ')[0]);
+        el.style.display = 'flex';
+      } else if (el) {
+        el.style.display = 'none';
+      }
+    }
+
+    // Close modal on Escape
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeMemberModal();
+    });
+
+
+    // ── PREMIUM SEARCH ─────────────────────────────────────────────────
+
+    let premiumImageData = null; // { r, g, b, brightness, warmth } from uploaded photo
+
+    function handlePremiumDrop(e) {
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) handlePremiumFile(file);
+    }
+
+    function handlePremiumFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const src = e.target.result;
+        document.getElementById('premium-preview-img').src = src;
+        document.getElementById('premium-upload-placeholder').style.display = 'none';
+        document.getElementById('premium-preview-wrap').style.display = 'block';
+        document.getElementById('premium-action').style.display = 'block';
+        document.getElementById('premium-results').style.display = 'none';
+
+        // Extract color signature from uploaded image via canvas
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          canvas.width = 32; canvas.height = 32;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, 32, 32);
+          const pixels = ctx.getImageData(0, 0, 32, 32).data;
+          let r = 0, g = 0, b = 0;
+          const total = 32 * 32;
+          for (let i = 0; i < pixels.length; i += 4) {
+            r += pixels[i]; g += pixels[i+1]; b += pixels[i+2];
+          }
+          r = r / total; g = g / total; b = b / total;
+          premiumImageData = {
+            r, g, b,
+            brightness: (r + g + b) / 3,
+            warmth: r - b // positive = warm, negative = cool
+          };
+        };
+        img.src = src;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    const PREMIUM_STEPS = [
+      'Analyzing facial features…',
+      'Mapping skin tone & contours…',
+      'Scanning surgeon gallery…',
+      'Ranking visual similarity…',
+      'Almost ready…'
+    ];
+
+    function runPremiumAnalysis() {
+      document.getElementById('premium-action').style.display = 'none';
+      document.getElementById('premium-results').style.display = 'none';
+      document.getElementById('premium-analyzing').style.display = 'block';
+      document.getElementById('premium-img-count').textContent = PAIRS.length;
+
+      let step = 0;
+      const labelEl = document.getElementById('premium-analyze-label');
+      const stepInterval = setInterval(() => {
+        step++;
+        if (step < PREMIUM_STEPS.length) labelEl.textContent = PREMIUM_STEPS[step];
+      }, 600);
+
+      setTimeout(() => {
+        clearInterval(stepInterval);
+        document.getElementById('premium-analyzing').style.display = 'none';
+        renderPremiumResults();
+      }, 3200);
+    }
+
+    function renderPremiumResults() {
+      // Score each image: compare its color signature against the uploaded photo.
+      // Since surgeon before images are cross-origin placeholders we can't pixel-read them,
+      // so we use their hex color codes as a proxy color signature.
+      const scored = PAIRS.map(img => {
+        // Parse placehold.co background hex from beforeUrl (e.g. /D4CFC9/)
+        const hexMatch = (img.beforeUrl || '').match(/\/([A-F0-9]{6})\//i);
+        let score = Math.random() * 0.2; // base randomness so ties break differently
+        if (hexMatch && premiumImageData) {
+          const hex = hexMatch[1];
+          const ir = parseInt(hex.slice(0,2),16);
+          const ig = parseInt(hex.slice(2,4),16);
+          const ib = parseInt(hex.slice(4,6),16);
+          const iBrightness = (ir + ig + ib) / 3;
+          const iWarmth = ir - ib;
+          // Similarity = inverse of euclidean distance in brightness+warmth space
+          const dist = Math.sqrt(
+            Math.pow((iBrightness - (premiumImageData.brightness || 128)) / 128, 2) +
+            Math.pow((iWarmth - (premiumImageData.warmth || 0)) / 255, 2)
+          );
+          score += Math.max(0, 1 - dist);
+        }
+        return { ...img, score };
+      });
+
+      // Sort descending by score, take top 12
+      scored.sort((a, b) => b.score - a.score);
+      const top = scored.slice(0, 12);
+
+      const grid = document.getElementById('premium-results-grid');
+      grid.innerHTML = top.map((img, i) => {
+        const surgeon = (SURGEONS || []).find(s => s.id === img.surgeonId) || {};
+        // Similarity % — top result is ~92–97%, scales down
+        const simPct = Math.round(97 - i * 3.5 + (Math.random() * 2 - 1));
+        return `
+          <div class="premium-match-card">
+            <div class="premium-match-images">
+              <div class="premium-match-img">
+                <img src="${img.beforeUrl}" alt="Before: ${img.procedure}" loading="lazy" />
+                <div class="img-overlay"></div>
+                <div class="img-color-layer"></div>
+                <span class="ba-label">Before</span>
+              </div>
+              <div class="premium-match-divider"></div>
+              <div class="premium-match-img">
+                <img src="${img.afterUrl}" alt="After: ${img.procedure}" loading="lazy" />
+                <div class="img-overlay"></div>
+                <div class="img-color-layer"></div>
+                <span class="ba-label after">After</span>
+              </div>
+            </div>
+            <div class="premium-match-footer">
+              <div>
+                <p style="font-size:0.6875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:0.2rem;">${img.category || ''}</p>
+                <p class="font-display" style="font-size:0.9375rem;font-weight:600;color:var(--deep);">${img.procedure}</p>
+                ${surgeon.name ? `<p style="font-size:0.75rem;color:#999;margin-top:0.125rem;">${surgeon.name} · ${surgeon.location || ''}</p>` : ''}
+              </div>
+              <span class="premium-similarity-badge">
+                <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+                ${simPct}% match
+              </span>
+            </div>
+          </div>`;
+      }).join('');
+
+      document.getElementById('premium-match-count').textContent = top.length;
+      document.getElementById('premium-results').style.display = 'block';
+    }
+
+    function resetPremiumSearch() {
+      premiumImageData = null;
+      document.getElementById('premium-file-input').value = '';
+      document.getElementById('premium-preview-img').src = '';
+      document.getElementById('premium-upload-placeholder').style.display = 'block';
+      document.getElementById('premium-preview-wrap').style.display = 'none';
+      document.getElementById('premium-action').style.display = 'none';
+      document.getElementById('premium-results').style.display = 'none';
+      document.getElementById('premium-results-grid').innerHTML = '';
+    }
+
+    // Expose surgeon data so renderPremiumResults can look up names
+    // (imageLibrary is set by loadImageLibrary; surgeonData is set below)
+
+  </script>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer style="background:var(--deep);color:#fff;padding:3.5rem 2rem 2rem;font-family:'Inter',system-ui,sans-serif;">
+    <div style="max-width:1100px;margin:0 auto;">
+
+      <!-- Top row -->
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;padding-bottom:3rem;border-bottom:1px solid rgba(255,255,255,0.08);">
+
+        <!-- Brand column -->
+        <div>
+          <!-- Logo mark -->
+          <div style="display:flex;align-items:center;gap:0.625rem;margin-bottom:1.25rem;">
+            <svg width="28" height="24" viewBox="0 0 36 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M18 4L3 4L11 20L18 28L25 20L33 4Z" fill="#2D7070"/>
+              <path d="M18 4L11 20L18 28L25 20Z" fill="#C4A855" opacity="0.9"/>
+            </svg>
+            <span style="font-family:'Playfair Display',Georgia,serif;font-size:1.25rem;font-weight:700;letter-spacing:-0.02em;color:#fff;">VUE</span>
+          </div>
+          <p style="font-size:0.875rem;line-height:1.75;color:rgba(255,255,255,0.5);max-width:260px;margin-bottom:1.75rem;">
+            Star what you love. Meet your surgeon. The smarter way to find board-certified plastic surgeons matched to your aesthetic.
+          </p>
+          <!-- Social icons -->
+          <div style="display:flex;gap:0.75rem;">
+            <!-- Instagram -->
+            <a href="#" aria-label="VUE on Instagram" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.6);transition:background 0.2s,color 0.2s;text-decoration:none;" onmouseover="this.style.background='#2D7070';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.07)';this.style.color='rgba(255,255,255,0.6)'">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </a>
+            <!-- TikTok -->
+            <a href="#" aria-label="VUE on TikTok" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.6);transition:background 0.2s,color 0.2s;text-decoration:none;" onmouseover="this.style.background='#2D7070';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.07)';this.style.color='rgba(255,255,255,0.6)'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.28 6.28 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.19 8.19 0 004.79 1.53V6.78a4.85 4.85 0 01-1.02-.09z"/></svg>
+            </a>
+            <!-- Facebook -->
+            <a href="#" aria-label="VUE on Facebook" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.6);transition:background 0.2s,color 0.2s;text-decoration:none;" onmouseover="this.style.background='#2D7070';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.07)';this.style.color='rgba(255,255,255,0.6)'">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </a>
+            <!-- YouTube -->
+            <a href="#" aria-label="VUE on YouTube" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.6);transition:background 0.2s,color 0.2s;text-decoration:none;" onmouseover="this.style.background='#2D7070';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.07)';this.style.color='rgba(255,255,255,0.6)'">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </a>
+            <!-- Pinterest -->
+            <a href="#" aria-label="VUE on Pinterest" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.6);transition:background 0.2s,color 0.2s;text-decoration:none;" onmouseover="this.style.background='#2D7070';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.07)';this.style.color='rgba(255,255,255,0.6)'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Platform -->
+        <div>
+          <p style="font-size:0.6875rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem;">Platform</p>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:0.75rem;">
+            <li><a href="#" onclick="showScreen('procedure');return false;" style="font-size:0.875rem;color:rgba(255,255,255,0.55);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">Browse Results</a></li>
+            <li><a href="#" onclick="showScreen('procedure');return false;" style="font-size:0.875rem;color:rgba(255,255,255,0.55);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">How It Works</a></li>
+            <li><a href="#" onclick="showScreen('surgeon-login');return false;" style="font-size:0.875rem;color:rgba(255,255,255,0.55);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">Surgeon Portal</a></li>
+            <li><a href="#" style="font-size:0.875rem;color:rgba(255,255,255,0.55);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">For Practices</a></li>
+          </ul>
+        </div>
+
+        <!-- Support -->
+        <div>
+          <p style="font-size:0.6875rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem;">Support</p>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:0.75rem;">
+            <li><a href="#" style="font-size:0.875rem;color:rgba(255,255,255,0.55);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">Help Center</a></li>
+            <li><a href="#" style="font-size:0.875rem;color:rgba(255,255,255,0.55);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">Contact Us</a></li>
+            <li><a href="#" style="font-size:0.875rem;color:rgba(255,255,255,0.55);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">Report a Problem</a></li>
+            <li><a href="mailto:support@vue.com" style="font-size:0.875rem;color:rgba(255,255,255,0.55);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">support@vue.com</a></li>
+          </ul>
+        </div>
+
+        <!-- Legal -->
+        <div>
+          <p style="font-size:0.6875rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem;">Legal</p>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:0.75rem;">
+            <li><a href="#" style="font-size:0.875rem;color:rgba(255,255,255,0.55);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">Privacy Policy</a></li>
+            <li><a href="#" style="font-size:0.875rem;color:rgba(255,255,255,0.55);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">Terms of Service</a></li>
+            <li><a href="#" style="font-size:0.875rem;color:rgba(255,255,255,0.55);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">Cookie Policy</a></li>
+            <li><a href="#" style="font-size:0.875rem;color:rgba(255,255,255,0.55);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.55)'">Accessibility</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Bottom row -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:1.75rem;flex-wrap:wrap;gap:1rem;">
+        <p style="font-size:0.8125rem;color:rgba(255,255,255,0.3);">
+          &copy; <span id="footer-year"></span> VUE Health, Inc. All rights reserved.
+        </p>
+        <p style="font-size:0.8125rem;color:rgba(255,255,255,0.25);">
+          Not a substitute for professional medical advice. Always consult a board-certified surgeon.
+        </p>
+      </div>
+
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+  </script>
+
+</body>
+</html>

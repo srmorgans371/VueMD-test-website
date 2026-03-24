@@ -1,0 +1,18 @@
+# Dev server
+node_modules/
+serve.mjs
+screenshot.mjs
+
+# Temporary screenshots
+temporary screenshots/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+*.code-workspace
+.vscode/
+
+# Claude
+CLAUDE.md
